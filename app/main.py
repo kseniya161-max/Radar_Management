@@ -9,3 +9,7 @@ app = FastAPI(
 @app.get("/")
 def root():
     return {"message": "LeadRadar is running"}
+
+from app.core.config import settings
+
+print(settings.DATABASE_URL)
