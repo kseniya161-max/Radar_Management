@@ -9,3 +9,5 @@ class Company(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     inn: Mapped[str] = mapped_column(String(12), unique=True)
     name: Mapped[str] = mapped_column(String(255))
+    status: Mapped[str] = mapped_column(String(50))
+    okved: Mapped[str] = mapped_column(String(20))
