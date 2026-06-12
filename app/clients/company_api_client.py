@@ -1,21 +1,63 @@
 import httpx
+from sqlalchemy import select
+
 from app.core.config import settings
+from app.models.company import Company
 
-
-BASE_URL = 'https://api.checko.ru/v2/search'
-
+BASE_URL = "https://api.checko.ru/v2/search"
 
 
 def search_companies_by_okved(okved_code: str):
+    """Делает запрос в API Checko и получает список компаний по ОКВЭД."""
     params = {
         "key": settings.CHECKO_API_KEY,
         "by": "okved",
         "obj": "org",
         "query": okved_code,
-        "limit": 2
+        "limit": 10,
     }
     with httpx.Client() as client:
         response = client.get(BASE_URL, params=params)
         response.raise_for_status()
         return response.json()
+
+
+def parse_company(raw_company: dict):
+    """Преобразует ответ от Checko API в нормальный словарь"""
+    return {
+        "inn": raw_company["ИНН"],
+        "name": raw_company["НаимСокр"],
+        "status": raw_company["Статус"],
+        "okved": raw_company["ОКВЭД"],
+    }
+
+
+def save_company_if_not_exists(session, company_data):
+    """Сохраняет компанию в БД, если её ещё нет (проверка по ИНН)"""
+
+    inn = company_data["inn"]
+    company = session.execute(
+        select(Company).where(Company.inn == inn)
+    ).scalar_one_or_none()
+
+    if company:
+        return company
+    new_company = Company(
+        inn=company_data["inn"],
+        name=company_data["name"],
+        status=company_data["status"],
+        okved=company_data["okved"],
+    )
+    session.add(new_company)
+    session.commit()
+    session.refresh(new_company)
+    return new_company
+
+
+def sync_companies(okved_code: str, session):
+    """Получает данные Checko API Парсит каждую компанию Сохраняет в БД(если ещё нет)"""
+    data = search_companies_by_okved(okved_code)
+    for raw_company in data["data"]["Записи"]:
+        company_data = parse_company(raw_company)
+        save_company_if_not_exists(session, company_data)
 
