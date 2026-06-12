@@ -21,13 +21,8 @@ def get_companies(db: Session):
     return result.scalars().all()
 
 
-def get_company_by_inn(
-    db: Session,
-    inn: str
-):
-    stmt = select(Company).where(
-        Company.inn == inn
-    )
+def get_company_by_inn(db: Session, inn: str):
+    stmt = select(Company).where(Company.inn == inn)
 
     result = db.execute(stmt)
 

@@ -29,5 +29,14 @@ db = SessionLocal()
 # if __name__ == "__main__":
 #     test()
 
-result = search_companies_by_okved("01.4")
-print(result)
+# result = search_companies_by_okved("01.4")
+# print(result)
+
+from app.database.session import SessionLocal
+from app.clients.company_api_client import sync_companies
+
+session = SessionLocal()
+
+sync_companies("01.41", session)
+
+session.close()

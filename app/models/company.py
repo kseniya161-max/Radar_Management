@@ -10,7 +10,7 @@ class Company(Base):
     inn: Mapped[str] = mapped_column(String(12), unique=True)
     name: Mapped[str] = mapped_column(String(255))
     status: Mapped[str] = mapped_column(String(50))
-    okved: Mapped[str] = mapped_column(String(20))
+    okved: Mapped[str] = mapped_column(String(255))
     revenue_2025: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     revenue_2024: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     tenders_count: Mapped[int] = mapped_column(default=0)
