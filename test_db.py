@@ -37,6 +37,6 @@ from app.clients.company_api_client import sync_companies
 
 session = SessionLocal()
 
-sync_companies("01", session)
+sync_companies("01.41", session)
 
 session.close()
