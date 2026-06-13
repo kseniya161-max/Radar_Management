@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.models.company import Company
 
 BASE_URL = "https://api.checko.ru/v2/search"
+COMPANY_URL = "https://api.checko.ru/v2/company"
 
 
 def search_companies_by_okved(okved_code: str):
@@ -61,4 +62,27 @@ def sync_companies(okved_code: str, session):
     for raw_company in data["data"]["Записи"]:
         company_data = parse_company(raw_company)
         save_company_if_not_exists(session, company_data)
+
+
+def get_company_contacts(inn: str):
+    """Получаем по ИНН контакты"""
+    params = {
+        "key":settings.CHECKO_API_KEY,
+        "inn": inn,
+    }
+
+    with httpx.Client() as client:
+        response = client.get(COMPANY_URL, params=params)
+        response.raise_for_status()
+        return response.json()
+
+
+def parse_contacts(data: dict):
+    contacts = data["data"]["Контакты"]
+    return {
+        "phone": contacts["Тел"][0] if contacts["Тел"] else None,
+        "email": contacts["Емэйл"][0] if contacts["Емэйл"] else None,
+        "website": contacts["ВебСайт"] if contacts["ВебСайт"] else None,
+
+    }
 

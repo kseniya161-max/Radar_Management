@@ -32,11 +32,30 @@ db = SessionLocal()
 # result = search_companies_by_okved("01.4")
 # print(result)
 
-from app.database.session import SessionLocal
-from app.clients.company_api_client import sync_companies
+# from app.database.session import SessionLocal
+# from app.clients.company_api_client import sync_companies
+#
+# session = SessionLocal()
+#
+# sync_companies("46.72", session)
+#
+# session.close()
 
-session = SessionLocal()
 
-sync_companies("46.72", session)
+# from app.clients.company_api_client import get_company_contacts
+#
+# data = get_company_contacts("3528015184")
+#
+# print(data)
 
-session.close()
+
+from app.clients.company_api_client import (
+    get_company_contacts,
+    parse_contacts,
+)
+
+data = get_company_contacts("3528015184")
+
+contacts = parse_contacts(data)
+
+print(contacts)
