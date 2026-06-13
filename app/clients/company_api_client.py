@@ -86,3 +86,25 @@ def parse_contacts(data: dict):
 
     }
 
+
+def update_company_contacts(session, inn: str):
+    new_data = get_company_contacts(inn)
+    contacts = parse_contacts(new_data)
+
+    company = session.execute(select(Company).where(Company.inn==inn)).scalar_one_or_none()
+
+    if not company:
+        return
+    company.phone = contacts["phone"]
+    company.email = contacts["email"]
+    company.website = contacts["website"]
+
+    session.commit()
+
+
+
+
+
+
+
+

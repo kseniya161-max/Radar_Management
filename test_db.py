@@ -49,13 +49,38 @@ db = SessionLocal()
 # print(data)
 
 
-from app.clients.company_api_client import (
-    get_company_contacts,
-    parse_contacts,
+# from app.clients.company_api_client import (
+#     get_company_contacts,
+#     parse_contacts,
+# )
+#
+# data = get_company_contacts("3528015184")
+#
+# contacts = parse_contacts(data)
+#
+# print(contacts)
+#
+#
+# from app.database.session import SessionLocal
+# from app.clients.company_api_client import update_company_contacts
+#
+# session = SessionLocal()
+#
+# update_company_contacts(
+#     session,
+#     "3528015184"
+# )
+#
+# session.close()
+
+from app.database.session import SessionLocal
+from app.clients.company_api_client import update_company_contacts
+
+session = SessionLocal()
+
+update_company_contacts(
+    session,
+    "3528015184"
 )
 
-data = get_company_contacts("3528015184")
-
-contacts = parse_contacts(data)
-
-print(contacts)
+session.close()
