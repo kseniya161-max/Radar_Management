@@ -1,4 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+
+from app.clients.company_api_client import sync_companies
+from app.database.db import get_db
+from app.models.company import Company
 
 app = FastAPI(
     title="LeadRadar API",
@@ -6,12 +11,17 @@ app = FastAPI(
     version="0.1.0",
 )
 
+@app.get("/companies")
+def all_companies(db: Session = Depends(get_db)):
+    companies = db.query(Company).all()
+    return companies
 
-@app.get("/")
-def root():
-    return {"message": "LeadRadar is running"}
+
+@app.post("/create/{okved_code}")
+def create_companies(okved_code: str,db: Session = Depends(get_db)):
+    sync_companies(okved_code, db)
+    return {"status": "ok", "message": f"Синхронизация для ОКВЭД {okved_code} завершена"}
 
 
-from app.core.config import settings
 
-print(settings.DATABASE_URL)
+
