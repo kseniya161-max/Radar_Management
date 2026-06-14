@@ -36,6 +36,16 @@ def update_contacts(inn:str, db: Session = Depends(get_db)):
     return {"status": "ok", inn: inn}
 
 
+@app.get("/companies/{inn}")
+def get_company(inn: str, db: Session = Depends(get_db)):
+    company = db.query(Company).filter(Company.inn == inn).first()
+
+    if not company:
+        return {"error": "Company not found"}
+
+    return company
+
+
 
 
 
