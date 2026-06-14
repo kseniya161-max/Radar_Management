@@ -58,6 +58,7 @@ def sync_companies(okved_code: str, session):
         save_company_if_not_exists(session, company_data)
 
 
+
 def get_company_contacts(inn: str):
     """Получаем по ИНН контакты"""
     params = {

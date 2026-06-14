@@ -7,10 +7,11 @@ from app.models.company import Company
 from app.services.company_service import update_company_finances
 
 app = FastAPI(
-    title="LeadRadar API",
-    description="Поиск и приоритизация B2B-лидов через API и AI",
+    title="KSENIA TEST 777",
+    description="KSENIA TEST 777",
     version="0.1.0",
 )
+
 
 @app.get("/companies")
 def all_companies(db: Session = Depends(get_db)):
@@ -21,6 +22,7 @@ def all_companies(db: Session = Depends(get_db)):
 @app.post("/create/{okved_code}")
 def create_companies(okved_code: str,db: Session = Depends(get_db)):
     sync_companies(okved_code, db)
+    db.commit()
     return {"status": "ok", "message": f"Синхронизация для ОКВЭД {okved_code} завершена"}
 
 
