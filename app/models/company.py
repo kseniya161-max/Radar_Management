@@ -13,6 +13,7 @@ class Company(Base):
     okved: Mapped[str] = mapped_column(String(255))
     revenue_2025: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     revenue_2024: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    revenue_2023: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     tenders_count: Mapped[int] = mapped_column(default=0)
     courts_count: Mapped[int] = mapped_column(default=0)
     phone: Mapped[str] = mapped_column(String(255), nullable=True,default=None)
