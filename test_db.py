@@ -6,7 +6,7 @@ from app.models.company import Company
 
 session = SessionLocal()
 
-inn = "2346010454"
+inn = "6901069168"
 
 try:
 
