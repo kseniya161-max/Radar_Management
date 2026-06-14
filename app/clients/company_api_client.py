@@ -36,25 +36,18 @@ def parse_company(raw_company: dict):
 
 
 def save_company_if_not_exists(session, company_data):
-    """Сохраняет компанию в БД, если её ещё нет (проверка по ИНН)"""
-
     inn = company_data["inn"]
+
     company = session.execute(
         select(Company).where(Company.inn == inn)
     ).scalar_one_or_none()
 
     if company:
         return company
-    new_company = Company(
-        inn=company_data["inn"],
-        name=company_data["name"],
-        status=company_data["status"],
-        okved=company_data["okved"],
-    )
-    session.add(new_company)
-    session.commit()
-    session.refresh(new_company)
-    return new_company
+
+    company = Company(**company_data)
+    session.add(company)
+    return company
 
 
 def sync_companies(okved_code: str, session):
@@ -92,15 +85,16 @@ def update_company_contacts(session, inn: str):
     new_data = get_company_contacts(inn)
     contacts = parse_contacts(new_data)
 
-    company = session.execute(select(Company).where(Company.inn==inn)).scalar_one_or_none()
+    company = session.scalar(
+        select(Company).where(Company.inn == inn)
+    )
 
     if not company:
         return
+
     company.phone = contacts["phone"]
     company.email = contacts["email"]
     company.website = contacts["website"]
-
-    session.commit()
 
 
 def get_company_finances(inn: str):

@@ -1,29 +1,37 @@
 from sqlalchemy.orm import Session
+
+from app.clients.company_api_client import get_company_finances, parse_finances, update_company_contacts, \
+    search_companies_by_okved, parse_company, save_company_if_not_exists
 from app.models.company import Company
 from sqlalchemy import select
 
 
-def create_company(db: Session):
-    company = Company(
-        inn="1234567890", name="ООО Ромашка", status="ACTIVE", okved="01.04"
+def update_company_finances(session, inn: str):
+    new_data = get_company_finances(inn)
+    finances = parse_finances(new_data)
+
+    company = session.scalar(
+        select(Company).where(Company.inn == inn)
     )
 
-    db.add(company)
-    db.commit()
-    db.refresh(company)
+    if not company:
+        return
 
-    return company
-
-
-def get_companies(db: Session):
-    stmt = select(Company)
-    result = db.execute(stmt)
-    return result.scalars().all()
+    company.revenue_2024 = finances["revenue_2024"]
+    company.revenue_2025 = finances["revenue_2025"]
+    company.revenue_2023 = finances["revenue_2023"]
 
 
-def get_company_by_inn(db: Session, inn: str):
-    stmt = select(Company).where(Company.inn == inn)
+def enrich_company_data(session, inn: str):
+    update_company_contacts(session, inn)
+    update_company_finances(session, inn)
 
-    result = db.execute(stmt)
 
-    return result.scalar_one_or_none()
+def sync_and_enrich_companies(okved_code: str, session):
+    data = search_companies_by_okved(okved_code)
+
+    for raw_company in data["data"]["Записи"]:
+        company_data = parse_company(raw_company)
+        company = save_company_if_not_exists(session, company_data)
+        enrich_company_data(session, company.inn)
+    session.commit()
