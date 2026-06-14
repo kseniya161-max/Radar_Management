@@ -6,6 +6,7 @@ from app.models.company import Company
 
 BASE_URL = "https://api.checko.ru/v2/search"
 COMPANY_URL = "https://api.checko.ru/v2/company"
+FINANCES_URL = "https://api.checko.ru/v2/finances"
 
 
 def search_companies_by_okved(okved_code: str):
@@ -100,6 +101,21 @@ def update_company_contacts(session, inn: str):
     company.website = contacts["website"]
 
     session.commit()
+
+
+def get_company_finances(inn: str):
+    params = {
+        "key": settings.CHECKO_API_KEY,
+        "inn": inn,
+    }
+    with httpx.Client() as client:
+        response = client.get(
+            FINANCES_URL,
+            params=params,
+        )
+        response.raise_for_status()
+
+        return response.json()
 
 
 

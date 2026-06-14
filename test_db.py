@@ -1,7 +1,7 @@
 from app.core.config import settings
 from app.database.session import SessionLocal
 from app.services.company_service import get_companies
-from app.clients.company_api_client import search_companies_by_okved
+from app.clients.company_api_client import search_companies_by_okved, get_company_finances
 
 db = SessionLocal()
 
@@ -73,14 +73,23 @@ db = SessionLocal()
 #
 # session.close()
 
-from app.database.session import SessionLocal
-from app.clients.company_api_client import update_company_contacts
+# from app.database.session import SessionLocal
+# from app.clients.company_api_client import update_company_contacts
+#
+# session = SessionLocal()
+#
+# update_company_contacts(
+#     session,
+#     "3528015184"
+# )
+#
+# session.close()
+#
+# data = get_company_finances("3528015184")
+#
+# print(data)
 
-session = SessionLocal()
 
-update_company_contacts(
-    session,
-    "3528015184"
-)
+data = get_company_finances("3528015184")
 
-session.close()
+print(data)

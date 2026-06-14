@@ -18,3 +18,5 @@ class Company(Base):
     phone: Mapped[str] = mapped_column(String(255), nullable=True,default=None)
     email: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
     website: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+    registration_date: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
+    region: Mapped[str] = mapped_column(String(255), nullable=True, default=None)
