@@ -118,6 +118,11 @@ def get_company_finances(inn: str):
         return response.json()
 
 
+def parse_finances(data: dict):
+    finances = data["data"]
+    return {"revenue_2024": finances.get("2024", {}).get("2110"),
+           "revenue_2025": finances.get("2025", {}).get("2110"),}
+
 
 
 

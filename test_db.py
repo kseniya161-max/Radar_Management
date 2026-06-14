@@ -1,7 +1,7 @@
 from app.core.config import settings
 from app.database.session import SessionLocal
 from app.services.company_service import get_companies
-from app.clients.company_api_client import search_companies_by_okved, get_company_finances
+from app.clients.company_api_client import search_companies_by_okved, get_company_finances, parse_finances
 
 db = SessionLocal()
 
@@ -90,6 +90,12 @@ db = SessionLocal()
 # print(data)
 
 
-data = get_company_finances("3528015184")
+# data = get_company_finances("7451432609")
+#
+# print(data["data"].keys())
 
-print(data)
+data = get_company_finances("7451432609")
+
+finances = parse_finances(data)
+
+print(finances)
