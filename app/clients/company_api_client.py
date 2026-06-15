@@ -33,7 +33,6 @@ def parse_company(raw_company: dict):
         "status": raw_company["Статус"],
         "okved": raw_company["ОКВЭД"],
         "registration_date": raw_company.get("ДатаРег"),
-        "region": raw_company.get("РегионКод"),
     }
 
 
@@ -76,13 +75,18 @@ def get_company_contacts(inn: str):
 
 
 def parse_contacts(data: dict):
-    contacts = data.get("data", {}).get("Контакты")
+    company_data = data.get("data", {})
+    contacts = company_data.get("Контакты")
+
+    region_info = company_data.get("Регион", {})
+    region_name = region_info.get("Наим") if region_info else None
 
     if not contacts:
         return {
             "phone": None,
             "email": None,
             "website": None,
+            "region": region_name,
         }
 
     phones = contacts.get("Тел", [])
@@ -91,6 +95,7 @@ def parse_contacts(data: dict):
         "phone": ", ".join(phones) if phones else None,
         "email": ", ".join(emails) if emails else None,
         "website": contacts.get("ВебСайт"),
+        "region": region_name,
     }
 
 
@@ -108,6 +113,7 @@ def update_company_contacts(session, inn: str):
     company.phone = contacts["phone"]
     company.email = contacts["email"]
     company.website = contacts["website"]
+    company.region = contacts["region"]
 
 
 def get_company_finances(inn: str):
