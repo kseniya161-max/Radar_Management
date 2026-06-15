@@ -74,11 +74,14 @@ def get_company_contacts(inn: str):
 
 def parse_contacts(data: dict):
     contacts = data["data"]["Контакты"]
-    return {
-        "phone": contacts["Тел"][0] if contacts["Тел"] else None,
-        "email": contacts["Емэйл"][0] if contacts["Емэйл"] else None,
-        "website": contacts["ВебСайт"] if contacts["ВебСайт"] else None,
 
+    phones = contacts.get("Тел", [])
+    emails = contacts.get("Емэйл", [])
+
+    return {
+        "phone": phones[0] if phones else None,
+        "email": emails[0] if emails else None,
+        "website": contacts.get("ВебСайт"),
     }
 
 

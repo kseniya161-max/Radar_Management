@@ -29,12 +29,14 @@ def create_companies(okved_code: str,db: Session = Depends(get_db)):
 @app.post("/companies/{inn}/finance")
 def update_finance(inn:str, db: Session = Depends(get_db)):
     update_company_finances(db, inn)
+    db.commit()
     return {"status": "ok", inn: inn}
 
 
 @app.post("/companies/{inn}/contacts")
 def update_contacts(inn:str, db: Session = Depends(get_db)):
     update_company_contacts(db, inn)
+    db.commit()
     return {"status": "ok", inn: inn}
 
 
