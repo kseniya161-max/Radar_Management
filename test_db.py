@@ -1,86 +1,51 @@
-from app.core.config import settings
+from sqlalchemy import select
+
 from app.database.session import SessionLocal
-from app.services.company_service import get_companies
-from app.clients.company_api_client import search_companies_by_okved
-
-db = SessionLocal()
-
+from app.services.company_service import update_company_finances
+from app.models.company import Company
+#
+# session = SessionLocal()
+#
+# inn = "6901069168"
+#
 # try:
-#     companies = get_companies(db)
 #
-#     for company in companies:
-#         print(
-#             company.id,
-#             company.inn,
-#             company.name,
-#             company.status,
-#             company.okved,
-#         )
+#     company = session.scalar(
+#         select(Company).where(Company.inn == inn)
+#     )
+#
+#     if not company:
+#         print("Такой компании нет в БД:", inn)
+#         exit()
+#
+#     print("Компания найдена:", company.name)
+#
+#
+#     update_company_finances(session, inn)
+#     session.commit()
+#
+#
+#     session.expire_all()
+#
+#     company = session.scalar(
+#         select(Company).where(Company.inn == inn)
+#     )
+#
+#
+#     print("РЕЗУЛЬТАТ:")
+#     print("revenue_2023:", company.revenue_2023)
+#     print("revenue_2024:", company.revenue_2024)
+#     print("revenue_2025:", company.revenue_2025)
+#
 # finally:
-#     db.close()
-
-# print(settings.CHECKO_API_KEY)
-
-# def test():
-#     inn = '4027148080'
-#     result = get_companies_info(inn)
-#     print(result.get("data", {}).get("НаимПолн"))
-#
-# if __name__ == "__main__":
-#     test()
-
-# result = search_companies_by_okved("01.4")
-# print(result)
-
-# from app.database.session import SessionLocal
-# from app.clients.company_api_client import sync_companies
-#
-# session = SessionLocal()
-#
-# sync_companies("46.72", session)
-#
-# session.close()
+#     session.close()
 
 
-# from app.clients.company_api_client import get_company_contacts
-#
-# data = get_company_contacts("3528015184")
-#
-# print(data)
-
-
-# from app.clients.company_api_client import (
-#     get_company_contacts,
-#     parse_contacts,
-# )
-#
-# data = get_company_contacts("3528015184")
-#
-# contacts = parse_contacts(data)
-#
-# print(contacts)
-#
-#
-# from app.database.session import SessionLocal
-# from app.clients.company_api_client import update_company_contacts
-#
-# session = SessionLocal()
-#
-# update_company_contacts(
-#     session,
-#     "3528015184"
-# )
-#
-# session.close()
-
-from app.database.session import SessionLocal
-from app.clients.company_api_client import update_company_contacts
+from app.database.db import SessionLocal
+from app.models.company import Company
 
 session = SessionLocal()
-
-update_company_contacts(
-    session,
-    "3528015184"
-)
-
+companies = session.query(Company).limit(5).all()
+for comp in companies:
+    print(f"{comp.name} | рег. дата: {comp.registration_date}")
 session.close()
