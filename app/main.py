@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from app.models.company import Company
-from app.services.company_service import update_company_finances
+from app.services.company_service import update_company_finances, enrich_company_data
 
 app = FastAPI(
     title="KSENIA TEST 777",
@@ -48,6 +48,15 @@ def get_company(inn: str, db: Session = Depends(get_db)):
         return {"error": "Company not found"}
 
     return company
+
+
+@app.post("/companies/{inn}/enrich")
+def enrich_company(
+        inn: str,
+        db: Session = Depends(get_db)
+):
+    enrich_company_data(inn, db)
+    return {"status": "ok", inn: inn}
 
 
 
