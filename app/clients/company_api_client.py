@@ -16,7 +16,7 @@ def search_companies_by_okved(okved_code: str):
         "by": "okved",
         "obj": "org",
         "query": okved_code,
-        "limit": 1,
+        "limit": 5,
         "active": "true",
     }
     with httpx.Client() as client:

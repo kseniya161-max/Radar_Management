@@ -7,7 +7,7 @@ from app.models.company import Company
 from app.services.company_service import update_company_finances, enrich_company_data
 
 app = FastAPI(
-    title="KSENIA TEST 999",
+    title="KSENIA TEST 998",
     description="KSENIA TEST 777",
     version="0.1.0",
 )
