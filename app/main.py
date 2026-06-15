@@ -7,11 +7,14 @@ from app.models.company import Company
 from app.services.company_service import update_company_finances, enrich_company_data
 
 app = FastAPI(
-    title="KSENIA TEST 777",
+    title="KSENIA TEST 999",
     description="KSENIA TEST 777",
     version="0.1.0",
 )
 
+@app.get("/ping")
+def ping():
+    return {"status": "ok", "message": "pong"}
 
 @app.get("/companies")
 def all_companies(db: Session = Depends(get_db)):
@@ -55,7 +58,8 @@ def enrich_company(
         inn: str,
         db: Session = Depends(get_db)
 ):
-    enrich_company_data(inn, db)
+    enrich_company_data(db, inn)
+    db.commit()
     return {"status": "ok", inn: inn}
 
 

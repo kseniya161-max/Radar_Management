@@ -73,14 +73,21 @@ def get_company_contacts(inn: str):
 
 
 def parse_contacts(data: dict):
-    contacts = data["data"]["Контакты"]
+    contacts = data.get("data", {}).get("Контакты")
+
+    if not contacts:
+        return {
+            "phone": None,
+            "email": None,
+            "website": None,
+        }
 
     phones = contacts.get("Тел", [])
     emails = contacts.get("Емэйл", [])
 
     return {
-        "phone": phones[0] if phones else None,
-        "email": emails[0] if emails else None,
+        "phone": ", ".join(phones) if phones else None,
+        "email": ", ".join(emails) if emails else None,
         "website": contacts.get("ВебСайт"),
     }
 
