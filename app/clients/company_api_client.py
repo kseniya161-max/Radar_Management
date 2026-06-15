@@ -16,7 +16,7 @@ def search_companies_by_okved(okved_code: str):
         "by": "okved",
         "obj": "org",
         "query": okved_code,
-        "limit": 50,
+        "limit": 1,
         "active": "true",
     }
     with httpx.Client() as client:
@@ -32,6 +32,8 @@ def parse_company(raw_company: dict):
         "name": raw_company["НаимСокр"],
         "status": raw_company["Статус"],
         "okved": raw_company["ОКВЭД"],
+        "registration_date": raw_company.get("ДатаРег"),
+        "region": raw_company.get("РегионКод"),
     }
 
 
@@ -53,6 +55,7 @@ def save_company_if_not_exists(session, company_data):
 def sync_companies(okved_code: str, session):
     """Получает данные Checko API Парсит каждую компанию Сохраняет в БД(если ещё нет)"""
     data = search_companies_by_okved(okved_code)
+    print(data)
     for raw_company in data["data"]["Записи"]:
         company_data = parse_company(raw_company)
         save_company_if_not_exists(session, company_data)
