@@ -87,7 +87,6 @@ def parse_contacts(data: dict):
 
     phones = contacts.get("Тел", [])
     emails = contacts.get("Емэйл", [])
-
     return {
         "phone": ", ".join(phones) if phones else None,
         "email": ", ".join(emails) if emails else None,
