@@ -20,6 +20,9 @@ def update_company_finances(session, inn: str):
     company.revenue_2024 = finances["revenue_2024"]
     company.revenue_2025 = finances["revenue_2025"]
     company.revenue_2023 = finances["revenue_2023"]
+    company.profit_2023 = finances["profit_2023"]
+    company.profit_2024 = finances["profit_2024"]
+    company.profit_2025 = finances["profit_2025"]
 
 
 def enrich_company_data(session, inn: str):
