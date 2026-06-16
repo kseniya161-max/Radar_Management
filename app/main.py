@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from app.models.company import Company
-from app.services.company_service import update_company_finances, enrich_company_data
+from app.services.company_service import update_company_finances, enrich_company_data, growth_calc
 
 app = FastAPI(
     title="KSENIA TEST 998",
@@ -19,7 +19,36 @@ def ping():
 @app.get("/companies")
 def all_companies(db: Session = Depends(get_db)):
     companies = db.query(Company).all()
-    return companies
+    result = []
+    for c in companies:
+        growth_profit = growth_calc(c.profit_2025, c.profit_2024)
+        growth_revenue = growth_calc(c.revenue_2025, c.revenue_2024)
+        result.append({
+            "id": c.id,
+            "inn": c.inn,
+            "name": c.name,
+            "status": c.status,
+            "okved": c.okved,
+            "revenue_2025": c.revenue_2025,
+            "revenue_2024": c.revenue_2024,
+            "revenue_2023": c.revenue_2023,
+            "profit_2025": c.profit_2025,
+            "profit_2024": c.profit_2024,
+            "profit_2023": c.profit_2023,
+            "revenue_growth": growth_revenue,
+            "profit_growth": growth_profit,
+            "phone": c.phone,
+            "email": c.email,
+            "website": c.website,
+            "region": c.region,
+            "registration_date": c.registration_date,
+            "tenders_count": c.tenders_count,
+            "courts_count": c.courts_count,
+        })
+    return result
+
+
+
 
 
 @app.post("/create/{okved_code}")

@@ -38,3 +38,9 @@ def sync_and_enrich_companies(okved_code: str, session):
         company = save_company_if_not_exists(session, company_data)
         enrich_company_data(session, company.inn)
     session.commit()
+
+
+def growth_calc(current: int | None, previous: int | None)-> float | None:
+    if previous is None or current is None or previous == 0:
+        return None
+    return round((current - previous) / abs(previous)* 100, 1)
