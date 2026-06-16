@@ -92,6 +92,36 @@ def enrich_company(
     return {"status": "ok", inn: inn}
 
 
+@app.post("/sync/{okved_code}/")
+def sync_company(okved_code: str, limit: int = 10, db: Session = Depends(get_db)):
+    sync_companies(okved_code, db)
+    db.commit()
+
+    companies = db.query(Company).filter(Company.okved == okved_code).limit(limit).all()
+    if not companies:
+        return {"status": "error", "message": f"Нет компаний с ОКВЭД {okved_code}"}
+
+    for company in companies:
+        try:
+            enrich_company_data(db, company.inn)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            print(f"Ошибка для {company.inn}: {e}")
+            continue
+    return {
+        "status": "ok",
+        "message": f"Обработано {len(companies)} компаний по ОКВЭД {okved_code}",
+        "processed_count": len(companies),
+        "okved": okved_code
+    }
+
+
+
+
+
+
+
 
 
 
