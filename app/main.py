@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from app.models.company import Company
-from app.services.company_service import update_company_finances, enrich_company_data
+from app.services.company_service import update_company_finances, enrich_company_data, growth_calc
 
 app = FastAPI(
     title="KSENIA TEST 998",
@@ -19,7 +19,36 @@ def ping():
 @app.get("/companies")
 def all_companies(db: Session = Depends(get_db)):
     companies = db.query(Company).all()
-    return companies
+    result = []
+    for c in companies:
+        growth_profit = growth_calc(c.profit_2025, c.profit_2024)
+        growth_revenue = growth_calc(c.revenue_2025, c.revenue_2024)
+        result.append({
+            "id": c.id,
+            "inn": c.inn,
+            "name": c.name,
+            "status": c.status,
+            "okved": c.okved,
+            "revenue_2025": c.revenue_2025,
+            "revenue_2024": c.revenue_2024,
+            "revenue_2023": c.revenue_2023,
+            "profit_2025": c.profit_2025,
+            "profit_2024": c.profit_2024,
+            "profit_2023": c.profit_2023,
+            "revenue_growth": growth_revenue,
+            "profit_growth": growth_profit,
+            "phone": c.phone,
+            "email": c.email,
+            "website": c.website,
+            "region": c.region,
+            "registration_date": c.registration_date,
+            "tenders_count": c.tenders_count,
+            "courts_count": c.courts_count,
+        })
+    return result
+
+
+
 
 
 @app.post("/create/{okved_code}")
@@ -61,6 +90,36 @@ def enrich_company(
     enrich_company_data(db, inn)
     db.commit()
     return {"status": "ok", inn: inn}
+
+
+@app.post("/sync/{okved_code}/")
+def sync_company(okved_code: str, limit: int = 10, db: Session = Depends(get_db)):
+    sync_companies(okved_code, db)
+    db.commit()
+
+    companies = db.query(Company).filter(Company.okved == okved_code).limit(limit).all()
+    if not companies:
+        return {"status": "error", "message": f"Нет компаний с ОКВЭД {okved_code}"}
+
+    for company in companies:
+        try:
+            enrich_company_data(db, company.inn)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            print(f"Ошибка для {company.inn}: {e}")
+            continue
+    return {
+        "status": "ok",
+        "message": f"Обработано {len(companies)} компаний по ОКВЭД {okved_code}",
+        "processed_count": len(companies),
+        "okved": okved_code
+    }
+
+
+
+
+
 
 
 

@@ -20,6 +20,9 @@ def update_company_finances(session, inn: str):
     company.revenue_2024 = finances["revenue_2024"]
     company.revenue_2025 = finances["revenue_2025"]
     company.revenue_2023 = finances["revenue_2023"]
+    company.profit_2023 = finances["profit_2023"]
+    company.profit_2024 = finances["profit_2024"]
+    company.profit_2025 = finances["profit_2025"]
 
 
 def enrich_company_data(session, inn: str):
@@ -35,3 +38,9 @@ def sync_and_enrich_companies(okved_code: str, session):
         company = save_company_if_not_exists(session, company_data)
         enrich_company_data(session, company.inn)
     session.commit()
+
+
+def growth_calc(current: int | None, previous: int | None)-> float | None:
+    if previous is None or current is None or previous == 0:
+        return None
+    return round((current - previous) / abs(previous)* 100, 1)

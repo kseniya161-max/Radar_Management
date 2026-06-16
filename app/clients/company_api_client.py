@@ -16,7 +16,7 @@ def search_companies_by_okved(okved_code: str):
         "by": "okved",
         "obj": "org",
         "query": okved_code,
-        "limit": 5,
+        "limit": 4,
         "active": "true",
     }
     with httpx.Client() as client:
@@ -120,6 +120,7 @@ def get_company_finances(inn: str):
     params = {
         "key": settings.CHECKO_API_KEY,
         "inn": inn,
+        "extended": "true",
     }
     with httpx.Client() as client:
         response = client.get(
@@ -132,13 +133,14 @@ def get_company_finances(inn: str):
 
 
 def parse_finances(data: dict):
-    finances = data["data"]
-    return {"revenue_2024": finances.get("2024", {}).get("2110"),
-           "revenue_2025": finances.get("2025", {}).get("2110"),
-            "revenue_2023": finances.get("2023", {}).get("2110"),}
-
-
-
+    finances = data.get("data", {})
+    return {"revenue_2024": finances.get("2024", {}).get("2110", {}).get("СумОтч"),
+           "revenue_2025": finances.get("2025", {}).get("2110", {}).get("СумОтч"),
+            "revenue_2023": finances.get("2023", {}).get("2110", {}).get("СумОтч"),
+            "profit_2023": finances.get("2023", {}).get("2400", {}).get("СумОтч"),
+            "profit_2024": finances.get("2024", {}).get("2400", {}).get("СумОтч"),
+            "profit_2025": finances.get("2025", {}).get("2400",{}).get("СумОтч"),
+            }
 
 
 
