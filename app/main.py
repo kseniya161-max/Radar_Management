@@ -14,10 +14,6 @@ app = FastAPI(
     version="0.1.0",
 )
 
-@app.get("/ping")
-def ping():
-    return {"status": "ok", "message": "pong"}
-
 @app.get("/companies")
 def all_companies(db: Session = Depends(get_db)):
     companies = db.query(Company).all()
