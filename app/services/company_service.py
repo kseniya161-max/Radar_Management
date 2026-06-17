@@ -6,16 +6,13 @@ from app.models.company import Company
 from sqlalchemy import select
 
 
-def update_company_finances(session, inn: str):
-    new_data = get_company_finances(inn)
-    finances = parse_finances(new_data)
-
-    company = session.scalar(
-        select(Company).where(Company.inn == inn)
-    )
-
+def update_company_finances(session, company):
     if not company:
         return
+    new_data = get_company_finances(company.inn)
+    finances = parse_finances(new_data)
+
+
 
     company.revenue_2024 = finances["revenue_2024"]
     company.revenue_2025 = finances["revenue_2025"]
@@ -25,9 +22,10 @@ def update_company_finances(session, inn: str):
     company.profit_2025 = finances["profit_2025"]
 
 
-def enrich_company_data(session, inn: str):
-    update_company_contacts(session, inn)
-    update_company_finances(session, inn)
+def enrich_company_data(session, company):
+    update_company_contacts(session, company)
+    update_company_finances(session, company)
+
 
 
 def sync_and_enrich_companies(okved_code: str, session):
@@ -36,11 +34,16 @@ def sync_and_enrich_companies(okved_code: str, session):
     for raw_company in data["data"]["Записи"]:
         company_data = parse_company(raw_company)
         company = save_company_if_not_exists(session, company_data)
-        enrich_company_data(session, company.inn)
-    session.commit()
+
+        enrich_company_data(session, company)
+
 
 
 def growth_calc(current: int | None, previous: int | None)-> float | None:
-    if previous is None or current is None or previous == 0:
+    if previous is None or current is None :
         return None
+    if previous == 0:
+        if current == 0:
+            return 0
+        return 100
     return round((current - previous) / abs(previous)* 100, 1)

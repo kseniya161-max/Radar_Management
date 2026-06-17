@@ -16,7 +16,7 @@ def search_companies_by_okved(okved_code: str):
         "by": "okved",
         "obj": "org",
         "query": okved_code,
-        "limit": 4,
+        "limit": 2,
         "active": "true",
     }
     with httpx.Client() as client:
@@ -98,22 +98,18 @@ def parse_contacts(data: dict):
         "region": region_name,
     }
 
-
-def update_company_contacts(session, inn: str):
-    new_data = get_company_contacts(inn)
-    contacts = parse_contacts(new_data)
-
-    company = session.scalar(
-        select(Company).where(Company.inn == inn)
-    )
-
+def update_company_contacts(session, company):
     if not company:
         return
+    new_data = get_company_contacts(company.inn)
+    contacts = parse_contacts(new_data)
+
 
     company.phone = contacts["phone"]
     company.email = contacts["email"]
     company.website = contacts["website"]
     company.region = contacts["region"]
+
 
 
 def get_company_finances(inn: str):
@@ -134,6 +130,7 @@ def get_company_finances(inn: str):
 
 def parse_finances(data: dict):
     finances = data.get("data", {})
+
     return {"revenue_2024": finances.get("2024", {}).get("2110", {}).get("СумОтч"),
            "revenue_2025": finances.get("2025", {}).get("2110", {}).get("СумОтч"),
             "revenue_2023": finances.get("2023", {}).get("2110", {}).get("СумОтч"),

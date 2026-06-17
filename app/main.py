@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Depends
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from app.models.company import Company
-from app.services.company_service import update_company_finances, enrich_company_data, growth_calc
+from app.services.company_service import update_company_finances, enrich_company_data, growth_calc, \
+    sync_and_enrich_companies
 
 app = FastAPI(
     title="KSENIA TEST 998",
@@ -58,18 +60,26 @@ def create_companies(okved_code: str,db: Session = Depends(get_db)):
     return {"status": "ok", "message": f"Синхронизация для ОКВЭД {okved_code} завершена"}
 
 
+# @app.post("/companies/{inn}/finance")
+# def update_finance(inn:str, db: Session = Depends(get_db)):
+#     update_company_finances(db, inn)
+#     db.commit()
+#     return {"status": "ok", inn: inn}
+
 @app.post("/companies/{inn}/finance")
 def update_finance(inn:str, db: Session = Depends(get_db)):
-    update_company_finances(db, inn)
+    company = db.scalar(select(Company).where(Company.inn == inn))
+    update_company_finances(db, company)
     db.commit()
-    return {"status": "ok", inn: inn}
+    return {"status": "ok"}
 
 
 @app.post("/companies/{inn}/contacts")
 def update_contacts(inn:str, db: Session = Depends(get_db)):
-    update_company_contacts(db, inn)
+    company = db.scalar(select(Company).where(Company.inn == inn))
+    update_company_contacts(db, company)
     db.commit()
-    return {"status": "ok", inn: inn}
+    return {"status": "ok"}
 
 
 @app.get("/companies/{inn}")
@@ -87,38 +97,21 @@ def enrich_company(
         inn: str,
         db: Session = Depends(get_db)
 ):
-    enrich_company_data(db, inn)
+    company = db.scalar(select(Company).where(Company.inn == inn))
+    enrich_company_data(db, company)
     db.commit()
-    return {"status": "ok", inn: inn}
+    return {"status": "ok"}
+
 
 
 @app.post("/sync/{okved_code}/")
-def sync_company(okved_code: str, limit: int = 10, db: Session = Depends(get_db)):
-    sync_companies(okved_code, db)
+def sync_company(okved_code: str, db: Session = Depends(get_db)):
+    sync_and_enrich_companies(okved_code,db)
     db.commit()
-
-    companies = db.query(Company).filter(Company.okved == okved_code).limit(limit).all()
-    if not companies:
-        return {"status": "error", "message": f"Нет компаний с ОКВЭД {okved_code}"}
-
-    for company in companies:
-        try:
-            enrich_company_data(db, company.inn)
-            db.commit()
-        except Exception as e:
-            db.rollback()
-            print(f"Ошибка для {company.inn}: {e}")
-            continue
     return {
         "status": "ok",
-        "message": f"Обработано {len(companies)} компаний по ОКВЭД {okved_code}",
-        "processed_count": len(companies),
-        "okved": okved_code
+        "message": f"Компании по ОКВЭД {okved_code} загружены и обогащены"
     }
-
-
-
-
 
 
 
