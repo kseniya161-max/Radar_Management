@@ -12,7 +12,7 @@ def build_company_prompt(company: Company) -> str:
 
     return f"""Вычисли прирост прибыли revenue_2025 и revenue_2024 в 
     процентном соотношении вычисли прирост выручки profit_2025 и profit_2024 в приоритетном соотношении и 
-    cоздай приритетность. ты  B2B lead scoring system верни только валидныq JSON {{
+    cоздай приритетность. ты  B2B lead scoring system верни только валидный JSON ответ должен быть на русском языке{{
   "priority": 1-100,
   "risk": "low|medium|high",
   "summary": "short explanation"

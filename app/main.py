@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.clients.ai_scoring_service import score_company
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from app.models.company import Company
@@ -63,13 +64,6 @@ def create_companies(okved_code: str, db: Session = Depends(get_db)):
     }
 
 
-# @app.post("/companies/{inn}/finance")
-# def update_finance(inn:str, db: Session = Depends(get_db)):
-#     update_company_finances(db, inn)
-#     db.commit()
-#     return {"status": "ok", inn: inn}
-
-
 @app.post("/companies/{inn}/finance")
 def update_finance(inn: str, db: Session = Depends(get_db)):
     company = db.scalar(select(Company).where(Company.inn == inn))
@@ -112,3 +106,16 @@ def sync_company(okved_code: str, db: Session = Depends(get_db)):
         "status": "ok",
         "message": f"Компании по ОКВЭД {okved_code} загружены и обогащены",
     }
+
+
+@app.post("/companies/{inn}/ai_score")
+def ai_score_company(inn: str, db: Session = Depends(get_db)):
+    company = db.scalar(select(Company).where(Company.inn == inn))
+    if not company:
+        return {
+            "error": "Комания не найдена"
+        }
+    result = score_company(company)
+    return result
+
+
