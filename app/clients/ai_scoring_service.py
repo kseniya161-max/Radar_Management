@@ -1,3 +1,6 @@
+import json
+import re
+
 from app.clients.ai_client import ask_ai
 from app.models.company import Company
 from app.services.company_service import growth_calc
@@ -30,11 +33,24 @@ Company data:
 - Phone: {company.phone}"""
 
 
+def extract_json(text: str) -> dict:
+    match = re.search(r"\{.*\}", text, re.S)
+    if not match:
+        return {"error": "invalid_json", "raw": text}
+
+    try:
+        return json.loads(match.group())
+    except json.JSONDecodeError:
+        return {"error": "json_decode_error", "raw": text}
+
+
+
 def score_company(company:Company)->dict:
     prompt = build_company_prompt(company)
     ai_response = ask_ai(prompt)
+    parsed = extract_json(ai_response)
     return {
         "inn": company.inn,
         "name": company.name,
-        "ai_score": ai_response
+        "ai_score": parsed
     }
