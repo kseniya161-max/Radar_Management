@@ -1,6 +1,9 @@
 import json
 import re
 
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
 from app.clients.ai_client import ask_ai
 from app.models.company import Company
 from app.services.company_service import growth_calc
@@ -54,3 +57,18 @@ def score_company(company:Company)->dict:
         "name": company.name,
         "ai_score": parsed
     }
+
+
+def score_all_companies(db:Session):
+    companies = db.scalars(select(Company)).all()
+    results = []
+    for company in companies:
+        result = score_company(company)
+        ai = result['ai_score']
+
+        company.ai_priority = ai.get('priority')
+        company.ai_risk = ai.get('risk')
+
+        results.append(result)
+
+
