@@ -36,7 +36,10 @@ Company data:
 - Phone: {company.phone}"""
 
 
-def extract_json(text: str) -> dict:
+def extract_json(text: str | None) -> dict:
+    if not text:
+        return {"error": "empty_response", "raw": text}
+
     match = re.search(r"\{.*\}", text, re.S)
     if not match:
         return {"error": "invalid_json", "raw": text}
@@ -45,7 +48,6 @@ def extract_json(text: str) -> dict:
         return json.loads(match.group())
     except json.JSONDecodeError:
         return {"error": "json_decode_error", "raw": text}
-
 
 
 def score_company(company:Company)->dict:
@@ -59,16 +61,34 @@ def score_company(company:Company)->dict:
     }
 
 
-def score_all_companies(db:Session):
+def score_all_companies(db: Session):
     companies = db.scalars(select(Company)).all()
+
     results = []
+
     for company in companies:
-        result = score_company(company)
-        ai = result['ai_score']
+        try:
+            result = score_company(company)
+            if not result:
+                continue
 
-        company.ai_priority = ai.get('priority')
-        company.ai_risk = ai.get('risk')
+            ai = result.get("ai_score") or {}
 
-        results.append(result)
+            priority = ai.get("priority")
+            if priority is None:
+                priority = 0
 
+            company.ai_priority = priority
+            company.ai_risk = ai.get("risk", "unknown")
 
+            results.append(result)
+
+        except Exception as e:
+            print(f"ERROR scoring {company.inn}: {e}")
+            continue
+
+    return {
+        "total": len(companies),
+        "processed": len(results),
+        "results": results,
+    }

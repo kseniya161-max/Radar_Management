@@ -20,6 +20,29 @@ app = FastAPI(
 )
 
 
+@app.get("/companies/ai_ranked")
+def get_ranked(db: Session = Depends(get_db)):
+    companies = db.scalars(select(Company)).all()
+    ranked = sorted(
+        companies,
+        key=lambda c: c.ai_priority or 0,
+        reverse=True
+    )
+
+    return [
+        {
+            "inn": c.inn,
+            "name": c.name,
+            "ai_priority": c.ai_priority,
+            "ai_risk": c.ai_risk,
+            "phone": c.phone,
+            "email": c.email,
+            "website": c.website,
+        }
+        for c in ranked
+    ]
+
+
 @app.get("/companies")
 def all_companies(db: Session = Depends(get_db)):
     companies = db.query(Company).all()
@@ -121,35 +144,18 @@ def ai_score_company(inn: str, db: Session = Depends(get_db)):
 
 @app.post("/companies/ai_score_all")
 def ai_score_company_all(db: Session = Depends(get_db)):
-    results = score_all_companies(db)
+    result = score_all_companies(db)
+
     db.commit()
+
     return {
         "status": "ok",
-        "scored": len(results),
-        "results": results,
+        "total": result["total"],
+        "processed": result["processed"],
+        "failed": result["total"] - result["processed"],
     }
 
 
-@app.get("/companies/ai_ranked")
-def get_ranked(db: Session = Depends(get_db)):
-    companies = db.scalars(select(Company)).all()
-    ranked = sorted(
-        companies,
-        key=lambda c: c.ai_priority or 0,
-        reverse=True
-    )
 
-    return [
-        {
-            "inn": c.inn,
-            "name": c.name,
-            "ai_priority": c.ai_priority,
-            "ai_risk": c.ai_risk,
-            "phone": c.phone,
-            "email": c.email,
-            "website": c.website,
-        }
-        for c in ranked
-    ]
 
 
