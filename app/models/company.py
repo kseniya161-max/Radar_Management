@@ -26,3 +26,5 @@ class Company(Base):
     profit_2023: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     profit_2024: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     profit_2025: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    ai_priority: Mapped[int | None] = mapped_column(nullable=True)
+    ai_risk: Mapped[int | None] = mapped_column(String(20), nullable=True)
