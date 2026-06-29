@@ -56,6 +56,30 @@ class SCompanyMessageResponse(BaseModel):
 class SCompanyStatusResponse(BaseModel):
     status: str
 
+class SAiScore(BaseModel):
+    priority: int
+    risk: str
+    summary: str
 
 
+class SCompanyAiScoreResponse(BaseModel):
+    inn: str
+    name: str
+    ai_score: SAiScore
 
+
+class SCompanyScoreAllResponse(BaseModel):
+    status: str
+    total: int
+    processed: int
+    failed: int
+
+
+class SCompanyRankedResponse(BaseModel):
+    inn: str
+    name: str
+    ai_priority: int | None
+    ai_risk: str | None
+    phone: str | None
+    email: str | None
+    website: str | None

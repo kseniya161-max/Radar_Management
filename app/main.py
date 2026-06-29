@@ -6,7 +6,8 @@ from app.clients.ai_scoring_service import score_company, score_all_companies
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from app.models.company import Company
-from app.schemas.company import SCompanyListResponse, SCompanyResponse, SCompanyMessageResponse, SCompanyStatusResponse
+from app.schemas.company import SCompanyListResponse, SCompanyResponse, SCompanyMessageResponse, SCompanyStatusResponse, \
+    SCompanyAiScoreResponse, SCompanyScoreAllResponse, SCompanyRankedResponse
 from app.services.company_service import (
     update_company_finances,
     enrich_company_data,
@@ -21,7 +22,7 @@ app = FastAPI(
 )
 
 
-@app.get("/companies/ai_ranked")
+@app.get("/companies/ai_ranked", response_model=list[SCompanyRankedResponse])
 def get_ranked(db: Session = Depends(get_db)):
     companies = db.scalars(select(Company)).all()
     ranked = sorted(
@@ -139,7 +140,7 @@ def sync_company(okved_code: str, db: Session = Depends(get_db)):
     }
 
 
-@app.post("/companies/{inn}/ai_score")
+@app.post("/companies/{inn}/ai_score", response_model=SCompanyAiScoreResponse)
 def ai_score_company(inn: str, db: Session = Depends(get_db)):
     company = db.scalar(select(Company).where(Company.inn == inn))
     if not company:
@@ -150,7 +151,7 @@ def ai_score_company(inn: str, db: Session = Depends(get_db)):
     return result
 
 
-@app.post("/companies/ai_score_all")
+@app.post("/companies/ai_score_all", response_model=SCompanyScoreAllResponse)
 def ai_score_company_all(db: Session = Depends(get_db)):
     result = score_all_companies(db)
 
