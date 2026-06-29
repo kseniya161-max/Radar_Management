@@ -6,8 +6,7 @@ from app.clients.ai_scoring_service import score_company, score_all_companies
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from app.models.company import Company
-from app.schemas.company import SCompanyListResponse, SCompanyResponse, SCompanyOkvedResponse, SCompanyFinanceResponse, \
-    SCompanyContactsResponse, SCompanyStatusResponse
+from app.schemas.company import SCompanyListResponse, SCompanyResponse, SCompanyMessageResponse, SCompanyStatusResponse
 from app.services.company_service import (
     update_company_finances,
     enrich_company_data,
@@ -80,7 +79,7 @@ def all_companies(db: Session = Depends(get_db)):
     return result
 
 
-@app.post("/create/{okved_code}", response_model=SCompanyOkvedResponse)
+@app.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
 def create_companies(okved_code: str, db: Session = Depends(get_db)):
     """Получение компаний по оквед"""
     sync_companies(okved_code, db)
@@ -120,16 +119,18 @@ def get_company(inn: str, db: Session = Depends(get_db)):
     return company
 
 
-@app.post("/companies/{inn}/enrich")
+@app.post("/companies/{inn}/enrich", response_model=SCompanyStatusResponse)
 def enrich_company(inn: str, db: Session = Depends(get_db)):
+    """Обогащения по инн"""
     company = db.scalar(select(Company).where(Company.inn == inn))
     enrich_company_data(db, company)
     db.commit()
     return {"status": "ok"}
 
 
-@app.post("/sync/{okved_code}/")
+@app.post("/sync/{okved_code}/", response_model=SCompanyMessageResponse)
 def sync_company(okved_code: str, db: Session = Depends(get_db)):
+    """ Обогащение по оквед"""
     sync_and_enrich_companies(okved_code, db)
     db.commit()
     return {

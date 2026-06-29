@@ -48,7 +48,7 @@ class SCompanyListResponse(BaseModel):
     profit_growth: float | None
 
 
-class SCompanyOkvedResponse(BaseModel):
+class SCompanyMessageResponse(BaseModel):
     status: str
     message: str
 
