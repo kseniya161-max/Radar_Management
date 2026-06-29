@@ -50,15 +50,11 @@ def extract_json(text: str | None) -> dict:
         return {"error": "json_decode_error", "raw": text}
 
 
-def score_company(company:Company)->dict:
+def score_company(company: Company) -> dict:
     prompt = build_company_prompt(company)
     ai_response = ask_ai(prompt)
     parsed = extract_json(ai_response)
-    return {
-        "inn": company.inn,
-        "name": company.name,
-        "ai_score": parsed
-    }
+    return {"inn": company.inn, "name": company.name, "ai_score": parsed}
 
 
 def score_all_companies(db: Session):

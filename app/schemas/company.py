@@ -24,7 +24,6 @@ class SCompanyResponse(BaseModel):
     ai_risk: str | None
 
 
-
 class SCompanyListResponse(BaseModel):
     id: int
     inn: str
@@ -55,6 +54,7 @@ class SCompanyMessageResponse(BaseModel):
 
 class SCompanyStatusResponse(BaseModel):
     status: str
+
 
 class SAiScore(BaseModel):
     priority: int

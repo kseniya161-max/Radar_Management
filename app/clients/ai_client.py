@@ -25,4 +25,4 @@ def ask_ai(prompt: str):
 
         return response.choices[0].message.content
     except RateLimitError:
-            return None
+        return None
