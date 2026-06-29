@@ -25,7 +25,7 @@ class SCompanyResponse(BaseModel):
 
 
 
-class SCompanyListResponse(SCompanyResponse):
+class SCompanyListResponse(BaseModel):
     id: int
     inn: str
     name: str
@@ -46,6 +46,11 @@ class SCompanyListResponse(SCompanyResponse):
     profit_2025: int | None
     revenue_growth: float | None
     profit_growth: float | None
+
+
+class SCompanyOkvedRequest(BaseModel):
+    status: str
+    message: str
 
 
 

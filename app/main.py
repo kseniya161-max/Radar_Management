@@ -6,7 +6,7 @@ from app.clients.ai_scoring_service import score_company, score_all_companies
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from app.models.company import Company
-from app.schemas.company import SCompanyListResponse, SCompanyResponse
+from app.schemas.company import SCompanyListResponse, SCompanyResponse, SCompanyOkvedRequest
 from app.services.company_service import (
     update_company_finances,
     enrich_company_data,
@@ -46,6 +46,7 @@ def get_ranked(db: Session = Depends(get_db)):
 
 @app.get("/companies",  response_model=list[SCompanyListResponse])
 def all_companies(db: Session = Depends(get_db)):
+    """ Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
     companies = db.query(Company).all()
     result = []
     for c in companies:
@@ -78,7 +79,7 @@ def all_companies(db: Session = Depends(get_db)):
     return result
 
 
-@app.post("/create/{okved_code}")
+@app.post("/create/{okved_code}", response_model=SCompanyOkvedRequest)
 def create_companies(okved_code: str, db: Session = Depends(get_db)):
     sync_companies(okved_code, db)
     db.commit()
@@ -106,6 +107,7 @@ def update_contacts(inn: str, db: Session = Depends(get_db)):
 
 @app.get("/companies/{inn}", response_model=SCompanyResponse)
 def get_company(inn: str, db: Session = Depends(get_db)):
+    """ Эндпоинт получения информации по компании по ИНН"""
     company = db.query(Company).filter(Company.inn == inn).first()
 
     if not company:
