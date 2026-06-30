@@ -9,6 +9,23 @@ COMPANY_URL = "https://api.checko.ru/v2/company"
 FINANCES_URL = "https://api.checko.ru/v2/finances"
 
 
+
+def request_checko(url: str, params: dict):
+    with httpx.Client(timeout=20) as client:
+        try:
+            response = client.get(url, params=params)
+            response.raise_for_status()
+            return response.json()
+
+        except httpx.TimeoutException:
+            raise CheckoAPIError("AI request API timeout")
+
+        except httpx.HTTPStatusError:
+            raise CheckoAPIError("AI request API returned an error")
+
+        except httpx.RequestError:
+            raise CheckoAPIError("AI connect to Checko API")
+
 def search_companies_by_okved(okved_code: str):
     """Делает запрос в API Checko и получает список компаний по ОКВЭД."""
     params = {
@@ -129,18 +146,4 @@ def parse_finances(data: dict):
 
 
 
-def request_checko(url: str, params: dict):
-    with httpx.Client(timeout=20) as client:
-        try:
-            response = client.get(url, params=params)
-            response.raise_for_status()
-            return response.json()
 
-        except httpx.TimeoutException:
-            raise CheckoAPIError("Checko API timeout")
-
-        except httpx.HTTPStatusError:
-            raise CheckoAPIError("Checko API returned an error")
-
-        except httpx.RequestError:
-            raise CheckoAPIError("Cannot connect to Checko API")
