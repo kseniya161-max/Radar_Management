@@ -1,7 +1,6 @@
-from fastapi import FastAPI, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
+from fastapi import FastAPI, Depends, HTTPException
 from app.clients.ai_scoring_service import score_company, score_all_companies
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
@@ -118,8 +117,10 @@ def get_company(inn: str, db: Session = Depends(get_db)):
     company = db.query(Company).filter(Company.inn == inn).first()
 
     if not company:
-        return {"error": "Company not found"}
-
+        raise HTTPException(
+            status_code=404,
+            detail='Company not found'
+        )
     return company
 
 
@@ -147,7 +148,10 @@ def sync_company(okved_code: str, db: Session = Depends(get_db)):
 def ai_score_company(inn: str, db: Session = Depends(get_db)):
     company = db.scalar(select(Company).where(Company.inn == inn))
     if not company:
-        return {"error": "Комания не найдена"}
+        raise HTTPException(
+        status_code=404,
+        detail="Company not found"
+    )
     result = score_company(company)
     return result
 
