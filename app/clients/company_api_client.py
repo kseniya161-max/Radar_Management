@@ -76,10 +76,20 @@ def get_company_contacts(inn: str):
         "inn": inn,
     }
 
-    with httpx.Client() as client:
-        response = client.get(COMPANY_URL, params=params)
-        response.raise_for_status()
-        return response.json()
+    with httpx.Client(timeout=20) as client:
+        try:
+            response = client.get(COMPANY_URL, params=params)
+            response.raise_for_status()
+            return response.json()
+
+        except httpx.TimeoutException:
+            raise CheckoAPIError("Checko API timeout")
+
+        except httpx.HTTPStatusError:
+            raise CheckoAPIError("Checko API returned an error")
+
+        except httpx.RequestError:
+            raise CheckoAPIError("Cannot connect to Checko API")
 
 
 def parse_contacts(data: dict):
@@ -125,14 +135,20 @@ def get_company_finances(inn: str):
         "inn": inn,
         "extended": "true",
     }
-    with httpx.Client() as client:
-        response = client.get(
-            FINANCES_URL,
-            params=params,
-        )
-        response.raise_for_status()
+    with httpx.Client(timeout=20) as client:
+        try:
+            response = client.get(FINANCES_URL, params=params)
+            response.raise_for_status()
+            return response.json()
 
-        return response.json()
+        except httpx.TimeoutException:
+            raise CheckoAPIError("Checko API timeout")
+
+        except httpx.HTTPStatusError:
+            raise CheckoAPIError("Checko API returned an error")
+
+        except httpx.RequestError:
+            raise CheckoAPIError("Cannot connect to Checko API")
 
 
 def parse_finances(data: dict):
