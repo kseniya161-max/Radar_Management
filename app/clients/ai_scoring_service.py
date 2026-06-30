@@ -1,10 +1,11 @@
 import json
 import re
-
+import httpx
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.clients.ai_client import ask_ai
+from app.exceptions.ai import AiAPIError
 from app.models.company import Company
 from app.services.company_service import growth_calc
 
@@ -79,9 +80,11 @@ def score_all_companies(db: Session):
 
             results.append(result)
 
-        except Exception as e:
+
+        except AiAPIError as e:
             print(f"ERROR scoring {company.inn}: {e}")
             continue
+
 
     return {
         "total": len(companies),

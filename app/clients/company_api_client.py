@@ -1,6 +1,6 @@
 import httpx
 from sqlalchemy import select
-
+from app.exceptions.checko import CheckoAPIError
 from app.core.config import settings
 from app.models.company import Company
 
@@ -8,6 +8,23 @@ BASE_URL = "https://api.checko.ru/v2/search"
 COMPANY_URL = "https://api.checko.ru/v2/company"
 FINANCES_URL = "https://api.checko.ru/v2/finances"
 
+
+
+def request_checko(url: str, params: dict):
+    with httpx.Client(timeout=20) as client:
+        try:
+            response = client.get(url, params=params)
+            response.raise_for_status()
+            return response.json()
+
+        except httpx.TimeoutException:
+            raise CheckoAPIError("AI request API timeout")
+
+        except httpx.HTTPStatusError:
+            raise CheckoAPIError("AI request API returned an error")
+
+        except httpx.RequestError:
+            raise CheckoAPIError("AI connect to Checko API")
 
 def search_companies_by_okved(okved_code: str):
     """Делает запрос в API Checko и получает список компаний по ОКВЭД."""
@@ -19,10 +36,7 @@ def search_companies_by_okved(okved_code: str):
         "limit": 2,
         "active": "true",
     }
-    with httpx.Client() as client:
-        response = client.get(BASE_URL, params=params)
-        response.raise_for_status()
-        return response.json()
+    return request_checko(BASE_URL, params)
 
 
 def parse_company(raw_company: dict):
@@ -66,11 +80,9 @@ def get_company_contacts(inn: str):
         "key": settings.CHECKO_API_KEY,
         "inn": inn,
     }
+    return request_checko(COMPANY_URL, params)
 
-    with httpx.Client() as client:
-        response = client.get(COMPANY_URL, params=params)
-        response.raise_for_status()
-        return response.json()
+
 
 
 def parse_contacts(data: dict):
@@ -116,14 +128,8 @@ def get_company_finances(inn: str):
         "inn": inn,
         "extended": "true",
     }
-    with httpx.Client() as client:
-        response = client.get(
-            FINANCES_URL,
-            params=params,
-        )
-        response.raise_for_status()
+    return request_checko(FINANCES_URL, params)
 
-        return response.json()
 
 
 def parse_finances(data: dict):
@@ -137,3 +143,7 @@ def parse_finances(data: dict):
         "profit_2024": finances.get("2024", {}).get("2400", {}).get("СумОтч"),
         "profit_2025": finances.get("2025", {}).get("2400", {}).get("СумОтч"),
     }
+
+
+
+
