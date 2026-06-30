@@ -1,6 +1,6 @@
 import httpx
 from sqlalchemy import select
-
+from app.exceptions.checko import CheckoAPIError
 from app.core.config import settings
 from app.models.company import Company
 
@@ -19,10 +19,19 @@ def search_companies_by_okved(okved_code: str):
         "limit": 2,
         "active": "true",
     }
-    with httpx.Client() as client:
-        response = client.get(BASE_URL, params=params)
-        response.raise_for_status()
-        return response.json()
+    with httpx.Client(timeout=20) as client:
+        try:
+            response = client.get(BASE_URL, params=params)
+            response.raise_for_status()
+            return response.json()
+        except httpx.TimeoutException:
+            raise CheckoAPIError("Checko API timeout")
+
+        except httpx.HTTPStatusError:
+            raise CheckoAPIError("Checko API returned an error")
+
+        except httpx.RequestError:
+            raise CheckoAPIError("Cannot connect to Checko API")
 
 
 def parse_company(raw_company: dict):
