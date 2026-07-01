@@ -8,6 +8,7 @@ from app.clients.ai_client import ask_ai
 from app.exceptions.ai import AiAPIError
 from app.models.company import Company
 from app.services.company_service import growth_calc
+from app.core.logger import logger
 
 
 def build_company_prompt(company: Company) -> str:
@@ -80,11 +81,13 @@ def score_all_companies(db: Session):
 
             results.append(result)
 
-
         except AiAPIError as e:
-            print(f"ERROR scoring {company.inn}: {e}")
+            logger.error(
+                "Error scoring company %s: %s",
+                company.inn,
+                e,
+            )
             continue
-
 
     return {
         "total": len(companies),
