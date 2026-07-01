@@ -97,6 +97,11 @@ def create_companies(okved_code: str, db: Session = Depends(get_db)):
 def update_finance(inn: str, db: Session = Depends(get_db)):
     """Обогащение финансами по ИНН"""
     company = db.scalar(select(Company).where(Company.inn == inn))
+    if not company:
+        raise HTTPException(
+            status_code=404,
+            detail='Company not found',
+        )
     update_company_finances(db, company)
     db.commit()
     return {"status": "ok"}
@@ -106,6 +111,11 @@ def update_finance(inn: str, db: Session = Depends(get_db)):
 def update_contacts(inn: str, db: Session = Depends(get_db)):
     """Обогащение контактами по ИНН"""
     company = db.scalar(select(Company).where(Company.inn == inn))
+    if not company:
+        raise HTTPException(
+            status_code=404,
+            detail='Company not found',
+        )
     update_company_contacts(db, company)
     db.commit()
     return {"status": "ok"}
@@ -128,6 +138,11 @@ def get_company(inn: str, db: Session = Depends(get_db)):
 def enrich_company(inn: str, db: Session = Depends(get_db)):
     """Обогащения по инн"""
     company = db.scalar(select(Company).where(Company.inn == inn))
+    if not company:
+        raise HTTPException(
+            status_code=404,
+            detail='Company not found',
+        )
     enrich_company_data(db, company)
     db.commit()
     return {"status": "ok"}
