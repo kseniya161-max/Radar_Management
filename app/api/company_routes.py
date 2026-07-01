@@ -8,8 +8,7 @@ from fastapi import APIRouter
 from app.models.company import Company
 from app.schemas.company import SCompanyListResponse, SCompanyMessageResponse, SCompanyStatusResponse, SCompanyResponse
 from app.services.company_service import growth_calc, update_company_finances, enrich_company_data, \
-    sync_and_enrich_companies
-
+    sync_and_enrich_companies, get_company_by_inn
 
 router = APIRouter(
     tags=["Companies"]
@@ -78,12 +77,7 @@ def update_finance(inn: str, db: Session = Depends(get_db)):
 @router.post("/companies/{inn}/contacts", response_model=SCompanyStatusResponse)
 def update_contacts(inn: str, db: Session = Depends(get_db)):
     """Обогащение контактами по ИНН"""
-    company = db.scalar(select(Company).where(Company.inn == inn))
-    if not company:
-        raise HTTPException(
-            status_code=404,
-            detail='Company not found',
-        )
+    company = get_company_by_inn(db, inn)
     update_company_contacts(db, company)
     db.commit()
     return {"status": "ok"}

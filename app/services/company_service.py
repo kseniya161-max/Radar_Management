@@ -1,4 +1,5 @@
-import httpx
+from fastapi import HTTPException
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.clients.company_api_client import (
@@ -11,8 +12,19 @@ from app.clients.company_api_client import (
 )
 from app.core.logger import logger
 from app.exceptions.checko import CheckoAPIError
+from app.exceptions.company_exc import CompanyNotFoundError
 from app.models.company import Company
-from sqlalchemy import select
+
+
+def get_company_by_inn(db: Session, inn: str) -> Company:
+
+    company = db.scalar(select(Company).where(Company.inn == inn))
+    if not company:
+        logger.warning("Company with INN %s not found", inn)
+        raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")
+
+    return company
+
 
 
 def update_company_finances(session, company):
