@@ -22,8 +22,6 @@ from app.services.company_service import (
 )
 
 
-
-
 from fastapi import FastAPI
 
 from app.api.company_routes import router as company_routes

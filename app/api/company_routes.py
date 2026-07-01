@@ -6,13 +6,22 @@ from app.clients.company_api_client import sync_companies, update_company_contac
 from app.database.db import get_db
 from fastapi import APIRouter
 from app.models.company import Company
-from app.schemas.company import SCompanyListResponse, SCompanyMessageResponse, SCompanyStatusResponse, SCompanyResponse
-from app.services.company_service import growth_calc, update_company_finances, enrich_company_data, \
-    sync_and_enrich_companies, get_company_by_inn
-
-router = APIRouter(
-    tags=["Companies"]
+from app.schemas.company import (
+    SCompanyListResponse,
+    SCompanyMessageResponse,
+    SCompanyStatusResponse,
+    SCompanyResponse,
 )
+from app.services.company_service import (
+    growth_calc,
+    update_company_finances,
+    enrich_company_data,
+    sync_and_enrich_companies,
+    get_company_by_inn,
+)
+
+router = APIRouter(tags=["Companies"])
+
 
 @router.get("/companies", response_model=list[SCompanyListResponse])
 def all_companies(db: Session = Depends(get_db)):
@@ -67,7 +76,7 @@ def update_finance(inn: str, db: Session = Depends(get_db)):
     if not company:
         raise HTTPException(
             status_code=404,
-            detail='Company not found',
+            detail="Company not found",
         )
     update_company_finances(db, company)
     db.commit()
@@ -89,10 +98,7 @@ def get_company(inn: str, db: Session = Depends(get_db)):
     company = db.query(Company).filter(Company.inn == inn).first()
 
     if not company:
-        raise HTTPException(
-            status_code=404,
-            detail='Company not found'
-        )
+        raise HTTPException(status_code=404, detail="Company not found")
     return company
 
 
@@ -103,7 +109,7 @@ def enrich_company(inn: str, db: Session = Depends(get_db)):
     if not company:
         raise HTTPException(
             status_code=404,
-            detail='Company not found',
+            detail="Company not found",
         )
     enrich_company_data(db, company)
     db.commit()

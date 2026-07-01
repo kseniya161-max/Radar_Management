@@ -81,11 +81,13 @@ def score_all_companies(db: Session):
 
             results.append(result)
 
-
         except AiAPIError as e:
-            logger.error("Error scoring company %s: %s", company.inn, e,)
+            logger.error(
+                "Error scoring company %s: %s",
+                company.inn,
+                e,
+            )
             continue
-
 
     return {
         "total": len(companies),

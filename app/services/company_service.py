@@ -26,7 +26,6 @@ def get_company_by_inn(db: Session, inn: str) -> Company:
     return company
 
 
-
 def update_company_finances(session, company):
     if not company:
         return
@@ -45,9 +44,11 @@ def enrich_company_data(session, company):
     try:
         update_company_contacts(session, company)
     except CheckoAPIError as e:
-        logger.warning("Failed to update contacts for %s: %s",
+        logger.warning(
+            "Failed to update contacts for %s: %s",
             company.inn,
-            e,)
+            e,
+        )
     try:
         update_company_finances(session, company)
     except CheckoAPIError as e:
@@ -56,7 +57,6 @@ def enrich_company_data(session, company):
             company.inn,
             e,
         )
-
 
 
 def sync_and_enrich_companies(okved_code: str, session):

@@ -5,11 +5,14 @@ from sqlalchemy.orm import Session
 from app.clients.ai_scoring_service import score_company, score_all_companies
 from app.database.db import get_db
 from app.models.company import Company
-from app.schemas.company import SCompanyRankedResponse, SCompanyAiScoreResponse, SCompanyScoreAllResponse
-
-router = APIRouter(
-    tags=["AI"]
+from app.schemas.company import (
+    SCompanyRankedResponse,
+    SCompanyAiScoreResponse,
+    SCompanyScoreAllResponse,
 )
+
+router = APIRouter(tags=["AI"])
+
 
 @router.get("/companies/ai_ranked", response_model=list[SCompanyRankedResponse])
 def get_ranked(db: Session = Depends(get_db)):
@@ -34,10 +37,7 @@ def get_ranked(db: Session = Depends(get_db)):
 def ai_score_company(inn: str, db: Session = Depends(get_db)):
     company = db.scalar(select(Company).where(Company.inn == inn))
     if not company:
-        raise HTTPException(
-        status_code=404,
-        detail="Company not found"
-    )
+        raise HTTPException(status_code=404, detail="Company not found")
     result = score_company(company)
     return result
 

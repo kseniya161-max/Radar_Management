@@ -10,7 +10,6 @@ COMPANY_URL = "https://api.checko.ru/v2/company"
 FINANCES_URL = "https://api.checko.ru/v2/finances"
 
 
-
 def request_checko(url: str, params: dict):
     with httpx.Client(timeout=20) as client:
         try:
@@ -26,6 +25,7 @@ def request_checko(url: str, params: dict):
 
         except httpx.RequestError:
             raise CheckoAPIError("No connection to Checko API")
+
 
 def search_companies_by_okved(okved_code: str):
     """Делает запрос в API Checko и получает список компаний по ОКВЭД."""
@@ -83,8 +83,6 @@ def get_company_contacts(inn: str):
     return request_checko(COMPANY_URL, params)
 
 
-
-
 def parse_contacts(data: dict):
     company_data = data.get("data", {})
     contacts = company_data.get("Контакты")
@@ -131,7 +129,6 @@ def get_company_finances(inn: str):
     return request_checko(FINANCES_URL, params)
 
 
-
 def parse_finances(data: dict):
     finances = data.get("data", {})
 
@@ -143,7 +140,3 @@ def parse_finances(data: dict):
         "profit_2024": finances.get("2024", {}).get("2400", {}).get("СумОтч"),
         "profit_2025": finances.get("2025", {}).get("2400", {}).get("СумОтч"),
     }
-
-
-
-
