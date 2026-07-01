@@ -1,3 +1,4 @@
+import httpx
 from sqlalchemy.orm import Session
 
 from app.clients.company_api_client import (
@@ -8,6 +9,8 @@ from app.clients.company_api_client import (
     parse_company,
     save_company_if_not_exists,
 )
+from app.core.logger import logger
+from app.exceptions.checko import CheckoAPIError
 from app.models.company import Company
 from sqlalchemy import select
 
@@ -27,8 +30,21 @@ def update_company_finances(session, company):
 
 
 def enrich_company_data(session, company):
-    update_company_contacts(session, company)
-    update_company_finances(session, company)
+    try:
+        update_company_contacts(session, company)
+    except CheckoAPIError as e:
+        logger.warning("Failed to update contacts for %s: %s",
+            company.inn,
+            e,)
+    try:
+        update_company_finances(session, company)
+    except CheckoAPIError as e:
+        logger.warning(
+            "Failed to update finances for %s: %s",
+            company.inn,
+            e,
+        )
+
 
 
 def sync_and_enrich_companies(okved_code: str, session):

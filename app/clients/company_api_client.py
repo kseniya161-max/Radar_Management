@@ -53,7 +53,6 @@ def parse_company(raw_company: dict):
 
 def save_company_if_not_exists(session, company_data):
     inn = company_data["inn"]
-
     company = session.execute(
         select(Company).where(Company.inn == inn)
     ).scalar_one_or_none()
