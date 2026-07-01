@@ -3,6 +3,7 @@ from sqlalchemy import select
 from app.exceptions.checko import CheckoAPIError
 from app.core.config import settings
 from app.models.company import Company
+from app.core.logger import logger
 
 BASE_URL = "https://api.checko.ru/v2/search"
 COMPANY_URL = "https://api.checko.ru/v2/company"
@@ -18,13 +19,13 @@ def request_checko(url: str, params: dict):
             return response.json()
 
         except httpx.TimeoutException:
-            raise CheckoAPIError("AI request API timeout")
+            raise CheckoAPIError("API timeout")
 
         except httpx.HTTPStatusError:
-            raise CheckoAPIError("AI request API returned an error")
+            raise CheckoAPIError("API returned an error")
 
         except httpx.RequestError:
-            raise CheckoAPIError("AI connect to Checko API")
+            raise CheckoAPIError("No connection to Checko API")
 
 def search_companies_by_okved(okved_code: str):
     """Делает запрос в API Checko и получает список компаний по ОКВЭД."""
@@ -68,7 +69,7 @@ def save_company_if_not_exists(session, company_data):
 def sync_companies(okved_code: str, session):
     """Получает данные Checko API Парсит каждую компанию Сохраняет в БД(если ещё нет)"""
     data = search_companies_by_okved(okved_code)
-    print(data)
+    logger.info("Received %s companies", len(data["data"]["Записи"]))
     for raw_company in data["data"]["Записи"]:
         company_data = parse_company(raw_company)
         save_company_if_not_exists(session, company_data)
