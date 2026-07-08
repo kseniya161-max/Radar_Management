@@ -8,12 +8,25 @@ from app.clients.company_api_client import (
     update_company_contacts,
     search_companies_by_okved,
     parse_company,
-    save_company_if_not_exists,
 )
 from app.core.logger import logger
 from app.exceptions.checko import CheckoAPIError
 from app.exceptions.company_exc import CompanyNotFoundError
 from app.models.company import Company
+
+
+def save_company_if_not_exists(session, company_data):
+    inn = company_data["inn"]
+    company = session.execute(
+        select(Company).where(Company.inn == inn)
+    ).scalar_one_or_none()
+
+    if company:
+        return company
+
+    company = Company(**company_data)
+    session.add(company)
+    return company
 
 
 def get_company_by_inn(db: Session, inn: str) -> Company:
@@ -77,3 +90,38 @@ def growth_calc(current: int | None, previous: int | None) -> float | None:
             return 0
         return 100
     return round((current - previous) / abs(previous) * 100, 1)
+
+
+def get_all_companies(db: Session):
+    companies = db.query(Company).all()
+    return [company_to_dict(company) for company in companies]
+
+
+
+def company_to_dict(company: Company) -> dict:
+    growth_profit = growth_calc(company.profit_2025, company.profit_2024)
+    growth_revenue = growth_calc(company.revenue_2025, company.revenue_2024)
+    return(
+            {
+                "id": company.id,
+                "inn": company.inn,
+                "name": company.name,
+                "status": company.status,
+                "okved": company.okved,
+                "revenue_2025": company.revenue_2025,
+                "revenue_2024": company.revenue_2024,
+                "revenue_2023": company.revenue_2023,
+                "profit_2025": company.profit_2025,
+                "profit_2024": company.profit_2024,
+                "profit_2023": company.profit_2023,
+                "revenue_growth": growth_revenue,
+                "profit_growth": growth_profit,
+                "phone": company.phone,
+                "email": company.email,
+                "website": company.website,
+                "region": company.region,
+                "registration_date": company.registration_date,
+                "tenders_count": company.tenders_count,
+                "courts_count": company.courts_count,
+            }
+        )

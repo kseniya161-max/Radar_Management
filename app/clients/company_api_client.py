@@ -51,20 +51,6 @@ def parse_company(raw_company: dict):
     }
 
 
-def save_company_if_not_exists(session, company_data):
-    inn = company_data["inn"]
-    company = session.execute(
-        select(Company).where(Company.inn == inn)
-    ).scalar_one_or_none()
-
-    if company:
-        return company
-
-    company = Company(**company_data)
-    session.add(company)
-    return company
-
-
 def sync_companies(okved_code: str, session):
     """Получает данные Checko API Парсит каждую компанию Сохраняет в БД(если ещё нет)"""
     data = search_companies_by_okved(okved_code)
