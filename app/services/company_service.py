@@ -77,3 +77,36 @@ def growth_calc(current: int | None, previous: int | None) -> float | None:
             return 0
         return 100
     return round((current - previous) / abs(previous) * 100, 1)
+
+
+def get_all_companies(db: Session):
+    companies = db.query(Company).all()
+    result = []
+    for c in companies:
+        growth_profit = growth_calc(c.profit_2025, c.profit_2024)
+        growth_revenue = growth_calc(c.revenue_2025, c.revenue_2024)
+        result.append(
+            {
+                "id": c.id,
+                "inn": c.inn,
+                "name": c.name,
+                "status": c.status,
+                "okved": c.okved,
+                "revenue_2025": c.revenue_2025,
+                "revenue_2024": c.revenue_2024,
+                "revenue_2023": c.revenue_2023,
+                "profit_2025": c.profit_2025,
+                "profit_2024": c.profit_2024,
+                "profit_2023": c.profit_2023,
+                "revenue_growth": growth_revenue,
+                "profit_growth": growth_profit,
+                "phone": c.phone,
+                "email": c.email,
+                "website": c.website,
+                "region": c.region,
+                "registration_date": c.registration_date,
+                "tenders_count": c.tenders_count,
+                "courts_count": c.courts_count,
+            }
+        )
+    return result

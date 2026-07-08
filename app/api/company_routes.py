@@ -13,11 +13,10 @@ from app.schemas.company import (
     SCompanyResponse,
 )
 from app.services.company_service import (
-    growth_calc,
     update_company_finances,
     enrich_company_data,
     sync_and_enrich_companies,
-    get_company_by_inn,
+    get_company_by_inn, get_all_companies,
 )
 
 router = APIRouter(tags=["Companies"])
@@ -26,36 +25,7 @@ router = APIRouter(tags=["Companies"])
 @router.get("/companies", response_model=list[SCompanyListResponse])
 def all_companies(db: Session = Depends(get_db)):
     """Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
-    companies = db.query(Company).all()
-    result = []
-    for c in companies:
-        growth_profit = growth_calc(c.profit_2025, c.profit_2024)
-        growth_revenue = growth_calc(c.revenue_2025, c.revenue_2024)
-        result.append(
-            {
-                "id": c.id,
-                "inn": c.inn,
-                "name": c.name,
-                "status": c.status,
-                "okved": c.okved,
-                "revenue_2025": c.revenue_2025,
-                "revenue_2024": c.revenue_2024,
-                "revenue_2023": c.revenue_2023,
-                "profit_2025": c.profit_2025,
-                "profit_2024": c.profit_2024,
-                "profit_2023": c.profit_2023,
-                "revenue_growth": growth_revenue,
-                "profit_growth": growth_profit,
-                "phone": c.phone,
-                "email": c.email,
-                "website": c.website,
-                "region": c.region,
-                "registration_date": c.registration_date,
-                "tenders_count": c.tenders_count,
-                "courts_count": c.courts_count,
-            }
-        )
-    return result
+    return get_all_companies(db)
 
 
 @router.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
