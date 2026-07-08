@@ -1,5 +1,4 @@
-from fastapi import Depends, HTTPException
-from sqlalchemy import select
+from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.clients.company_api_client import sync_companies, update_company_contacts
