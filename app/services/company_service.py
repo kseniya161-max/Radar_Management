@@ -8,12 +8,25 @@ from app.clients.company_api_client import (
     update_company_contacts,
     search_companies_by_okved,
     parse_company,
-    save_company_if_not_exists,
 )
 from app.core.logger import logger
 from app.exceptions.checko import CheckoAPIError
 from app.exceptions.company_exc import CompanyNotFoundError
 from app.models.company import Company
+
+
+def save_company_if_not_exists(session, company_data):
+    inn = company_data["inn"]
+    company = session.execute(
+        select(Company).where(Company.inn == inn)
+    ).scalar_one_or_none()
+
+    if company:
+        return company
+
+    company = Company(**company_data)
+    session.add(company)
+    return company
 
 
 def get_company_by_inn(db: Session, inn: str) -> Company:
