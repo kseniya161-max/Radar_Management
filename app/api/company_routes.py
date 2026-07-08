@@ -42,12 +42,7 @@ def create_companies(okved_code: str, db: Session = Depends(get_db)):
 @router.post("/companies/{inn}/finance", response_model=SCompanyStatusResponse)
 def update_finance(inn: str, db: Session = Depends(get_db)):
     """Обогащение финансами по ИНН"""
-    company = db.scalar(select(Company).where(Company.inn == inn))
-    if not company:
-        raise HTTPException(
-            status_code=404,
-            detail="Company not found",
-        )
+    company = get_company_by_inn(db, inn)
     update_company_finances(db, company)
     db.commit()
     return {"status": "ok"}
@@ -65,22 +60,14 @@ def update_contacts(inn: str, db: Session = Depends(get_db)):
 @router.get("/companies/{inn}", response_model=SCompanyResponse)
 def get_company(inn: str, db: Session = Depends(get_db)):
     """Эндпоинт получения информации по компании по ИНН"""
-    company = db.query(Company).filter(Company.inn == inn).first()
-
-    if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
+    company = get_company_by_inn(db, inn)
     return company
 
 
 @router.post("/companies/{inn}/enrich", response_model=SCompanyStatusResponse)
 def enrich_company(inn: str, db: Session = Depends(get_db)):
     """Обогащения по инн"""
-    company = db.scalar(select(Company).where(Company.inn == inn))
-    if not company:
-        raise HTTPException(
-            status_code=404,
-            detail="Company not found",
-        )
+    company = get_company_by_inn(db, inn)
     enrich_company_data(db, company)
     db.commit()
     return {"status": "ok"}
