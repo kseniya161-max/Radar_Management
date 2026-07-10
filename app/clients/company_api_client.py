@@ -4,6 +4,7 @@ from app.exceptions.checko import CheckoAPIError
 from app.core.config import settings
 from app.models.company import Company
 from app.core.logger import logger
+from app.services.company_service import save_company_if_not_exists
 
 BASE_URL = "https://api.checko.ru/v2/search"
 COMPANY_URL = "https://api.checko.ru/v2/company"

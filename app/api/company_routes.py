@@ -8,7 +8,7 @@ from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,
     SCompanyStatusResponse,
-    SCompanyResponse,
+    SCompanyResponse, SCompanyPageResponse,
 )
 from app.services.company_service import (
     update_company_finances,
@@ -21,7 +21,7 @@ from app.services.company_service import (
 router = APIRouter(tags=["Companies"])
 
 
-@router.get("/companies", response_model=list[SCompanyListResponse])
+@router.get("/companies", response_model=SCompanyPageResponse)
 def all_companies(
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),

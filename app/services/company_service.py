@@ -93,8 +93,12 @@ def growth_calc(current: int | None, previous: int | None) -> float | None:
 
 
 def get_all_companies(db: Session, limit: int, offset: int):
+    total = db.query(Company).count()
     companies = db.query(Company).offset(offset).limit(limit).all()
-    return [company_to_dict(company) for company in companies]
+    return {"total": total,
+            "limit": limit,
+            "offset": offset,
+            "items": [company_to_dict(company) for company in companies],}
 
 
 def company_to_dict(company: Company) -> dict:
