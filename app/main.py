@@ -10,4 +10,3 @@ app = FastAPI(
 
 app.include_router(company_routes)
 app.include_router(ai_routes)
-

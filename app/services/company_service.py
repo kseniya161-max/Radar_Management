@@ -97,31 +97,28 @@ def get_all_companies(db: Session):
     return [company_to_dict(company) for company in companies]
 
 
-
 def company_to_dict(company: Company) -> dict:
     growth_profit = growth_calc(company.profit_2025, company.profit_2024)
     growth_revenue = growth_calc(company.revenue_2025, company.revenue_2024)
-    return(
-            {
-                "id": company.id,
-                "inn": company.inn,
-                "name": company.name,
-                "status": company.status,
-                "okved": company.okved,
-                "revenue_2025": company.revenue_2025,
-                "revenue_2024": company.revenue_2024,
-                "revenue_2023": company.revenue_2023,
-                "profit_2025": company.profit_2025,
-                "profit_2024": company.profit_2024,
-                "profit_2023": company.profit_2023,
-                "revenue_growth": growth_revenue,
-                "profit_growth": growth_profit,
-                "phone": company.phone,
-                "email": company.email,
-                "website": company.website,
-                "region": company.region,
-                "registration_date": company.registration_date,
-                "tenders_count": company.tenders_count,
-                "courts_count": company.courts_count,
-            }
-        )
+    return {
+        "id": company.id,
+        "inn": company.inn,
+        "name": company.name,
+        "status": company.status,
+        "okved": company.okved,
+        "revenue_2025": company.revenue_2025,
+        "revenue_2024": company.revenue_2024,
+        "revenue_2023": company.revenue_2023,
+        "profit_2025": company.profit_2025,
+        "profit_2024": company.profit_2024,
+        "profit_2023": company.profit_2023,
+        "revenue_growth": growth_revenue,
+        "profit_growth": growth_profit,
+        "phone": company.phone,
+        "email": company.email,
+        "website": company.website,
+        "region": company.region,
+        "registration_date": company.registration_date,
+        "tenders_count": company.tenders_count,
+        "courts_count": company.courts_count,
+    }

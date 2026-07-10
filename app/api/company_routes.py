@@ -1,5 +1,5 @@
 from fastapi import Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
 
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
@@ -14,16 +14,21 @@ from app.services.company_service import (
     update_company_finances,
     enrich_company_data,
     sync_and_enrich_companies,
-    get_company_by_inn, get_all_companies,
+    get_company_by_inn,
+    get_all_companies,
 )
 
 router = APIRouter(tags=["Companies"])
 
 
 @router.get("/companies", response_model=list[SCompanyListResponse])
-def all_companies(db: Session = Depends(get_db)):
+def all_companies(
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
     """Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
-    return get_all_companies(db)
+    return get_all_companies(db, limit, offset)
 
 
 @router.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
