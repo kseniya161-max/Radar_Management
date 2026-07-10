@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from app.clients.company_api_client import (
@@ -29,9 +30,9 @@ def save_company_if_not_exists(session, company_data):
     return company
 
 
-def get_company_by_inn(db: Session, inn: str) -> Company:
+async def get_company_by_inn(db: AsyncSession, inn: str) -> Company:
 
-    company = db.scalar(select(Company).where(Company.inn == inn))
+    company = await db.scalar(select(Company).where(Company.inn == inn))
     if not company:
         logger.warning("Company with INN %s not found", inn)
         raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")

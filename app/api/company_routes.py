@@ -1,5 +1,6 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
