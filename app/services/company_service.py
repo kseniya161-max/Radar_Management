@@ -92,8 +92,8 @@ def growth_calc(current: int | None, previous: int | None) -> float | None:
     return round((current - previous) / abs(previous) * 100, 1)
 
 
-def get_all_companies(db: Session):
-    companies = db.query(Company).all()
+def get_all_companies(db: Session, limit: int, offset: int):
+    companies = db.query(Company).offset(offset).limit(limit).all()
     return [company_to_dict(company) for company in companies]
 
 
