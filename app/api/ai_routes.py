@@ -1,8 +1,6 @@
 from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
-from app.clients.ai_scoring_service import score_company, score_all_companies
 from app.database.db import get_db
 from app.models.company import Company
 from app.schemas.company import (
@@ -10,6 +8,7 @@ from app.schemas.company import (
     SCompanyAiScoreResponse,
     SCompanyScoreAllResponse,
 )
+from app.services.ai_service import score_company, score_all_companies
 
 router = APIRouter(tags=["AI"])
 

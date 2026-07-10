@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from fastapi import APIRouter
-from app.models.company import Company
 from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,

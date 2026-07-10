@@ -1,14 +1,14 @@
 import json
 import re
-import httpx
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.clients.ai_client import ask_ai
+from app.core.logger import logger
 from app.exceptions.ai import AiAPIError
 from app.models.company import Company
 from app.services.company_service import growth_calc
-from app.core.logger import logger
 
 
 def build_company_prompt(company: Company) -> str:
