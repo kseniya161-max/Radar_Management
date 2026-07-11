@@ -83,3 +83,11 @@ class SCompanyRankedResponse(BaseModel):
     phone: str | None
     email: str | None
     website: str | None
+
+
+class SCompanyPageResponse(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    items: list[SCompanyListResponse]
+

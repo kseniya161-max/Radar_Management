@@ -1,5 +1,6 @@
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from app.clients.company_api_client import (
@@ -29,9 +30,9 @@ def save_company_if_not_exists(session, company_data):
     return company
 
 
-def get_company_by_inn(db: Session, inn: str) -> Company:
+async def get_company_by_inn(db: AsyncSession, inn: str) -> Company:
 
-    company = db.scalar(select(Company).where(Company.inn == inn))
+    company = await db.scalar(select(Company).where(Company.inn == inn))
     if not company:
         logger.warning("Company with INN %s not found", inn)
         raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")
@@ -39,10 +40,10 @@ def get_company_by_inn(db: Session, inn: str) -> Company:
     return company
 
 
-def update_company_finances(session, company):
+async def update_company_finances(db: AsyncSession, company: Company):
     if not company:
         return
-    new_data = get_company_finances(company.inn)
+    new_data = await get_company_finances(company.inn)
     finances = parse_finances(new_data)
 
     company.revenue_2024 = finances["revenue_2024"]
@@ -53,7 +54,7 @@ def update_company_finances(session, company):
     company.profit_2025 = finances["profit_2025"]
 
 
-def enrich_company_data(session, company):
+async def enrich_company_data(session, company):
     try:
         update_company_contacts(session, company)
     except CheckoAPIError as e:
@@ -92,36 +93,54 @@ def growth_calc(current: int | None, previous: int | None) -> float | None:
     return round((current - previous) / abs(previous) * 100, 1)
 
 
-def get_all_companies(db: Session):
-    companies = db.query(Company).all()
-    return [company_to_dict(company) for company in companies]
+async def get_all_companies(
+    db: AsyncSession,
+    limit: int,
+    offset: int,
+):
+
+    total_stmt = select(func.count()).select_from(Company)
+    total = await db.scalar(total_stmt)
+    stmt = (
+        select(Company)
+        .offset(offset)
+        .limit(limit)
+    )
+    result = await db.execute(stmt)
+
+    companies = result.scalars().all()
+    return {
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "items": [company_to_dict(company) for company in companies],
+    }
+
 
 
 
 def company_to_dict(company: Company) -> dict:
     growth_profit = growth_calc(company.profit_2025, company.profit_2024)
     growth_revenue = growth_calc(company.revenue_2025, company.revenue_2024)
-    return(
-            {
-                "id": company.id,
-                "inn": company.inn,
-                "name": company.name,
-                "status": company.status,
-                "okved": company.okved,
-                "revenue_2025": company.revenue_2025,
-                "revenue_2024": company.revenue_2024,
-                "revenue_2023": company.revenue_2023,
-                "profit_2025": company.profit_2025,
-                "profit_2024": company.profit_2024,
-                "profit_2023": company.profit_2023,
-                "revenue_growth": growth_revenue,
-                "profit_growth": growth_profit,
-                "phone": company.phone,
-                "email": company.email,
-                "website": company.website,
-                "region": company.region,
-                "registration_date": company.registration_date,
-                "tenders_count": company.tenders_count,
-                "courts_count": company.courts_count,
-            }
-        )
+    return {
+        "id": company.id,
+        "inn": company.inn,
+        "name": company.name,
+        "status": company.status,
+        "okved": company.okved,
+        "revenue_2025": company.revenue_2025,
+        "revenue_2024": company.revenue_2024,
+        "revenue_2023": company.revenue_2023,
+        "profit_2025": company.profit_2025,
+        "profit_2024": company.profit_2024,
+        "profit_2023": company.profit_2023,
+        "revenue_growth": growth_revenue,
+        "profit_growth": growth_profit,
+        "phone": company.phone,
+        "email": company.email,
+        "website": company.website,
+        "region": company.region,
+        "registration_date": company.registration_date,
+        "tenders_count": company.tenders_count,
+        "courts_count": company.courts_count,
+    }

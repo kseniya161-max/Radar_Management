@@ -1,30 +1,35 @@
 from fastapi import Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import get_db
 from fastapi import APIRouter
-from app.models.company import Company
 from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,
     SCompanyStatusResponse,
-    SCompanyResponse,
+    SCompanyResponse, SCompanyPageResponse,
 )
 from app.services.company_service import (
     update_company_finances,
     enrich_company_data,
     sync_and_enrich_companies,
-    get_company_by_inn, get_all_companies,
+    get_company_by_inn,
+    get_all_companies,
 )
 
 router = APIRouter(tags=["Companies"])
 
 
-@router.get("/companies", response_model=list[SCompanyListResponse])
-def all_companies(db: Session = Depends(get_db)):
+@router.get("/companies", response_model=SCompanyPageResponse)
+async def all_companies(
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    db: AsyncSession = Depends(get_db),
+):
     """Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
-    return get_all_companies(db)
+    return await get_all_companies(db, limit, offset)
 
 
 @router.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
@@ -39,27 +44,27 @@ def create_companies(okved_code: str, db: Session = Depends(get_db)):
 
 
 @router.post("/companies/{inn}/finance", response_model=SCompanyStatusResponse)
-def update_finance(inn: str, db: Session = Depends(get_db)):
+async def update_finance(inn: str, db: AsyncSession = Depends(get_db)):
     """Обогащение финансами по ИНН"""
-    company = get_company_by_inn(db, inn)
-    update_company_finances(db, company)
-    db.commit()
+    company = await get_company_by_inn(db, inn)
+    await update_company_finances(db, company)
+    await db.commit()
     return {"status": "ok"}
 
 
 @router.post("/companies/{inn}/contacts", response_model=SCompanyStatusResponse)
-def update_contacts(inn: str, db: Session = Depends(get_db)):
+async def update_contacts(inn: str, db: AsyncSession = Depends(get_db)):
     """Обогащение контактами по ИНН"""
-    company = get_company_by_inn(db, inn)
-    update_company_contacts(db, company)
-    db.commit()
+    company = await get_company_by_inn(db, inn)
+    await update_company_contacts(db, company)
+    await db.commit()
     return {"status": "ok"}
 
 
 @router.get("/companies/{inn}", response_model=SCompanyResponse)
-def get_company(inn: str, db: Session = Depends(get_db)):
+async def get_company(inn: str, db: AsyncSession = Depends(get_db)):
     """Эндпоинт получения информации по компании по ИНН"""
-    company = get_company_by_inn(db, inn)
+    company = await get_company_by_inn(db, inn)
     return company
 
 

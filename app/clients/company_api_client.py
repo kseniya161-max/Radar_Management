@@ -1,19 +1,22 @@
 import httpx
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.exceptions.checko import CheckoAPIError
 from app.core.config import settings
 from app.models.company import Company
 from app.core.logger import logger
+from app.services.company_service import save_company_if_not_exists
 
 BASE_URL = "https://api.checko.ru/v2/search"
 COMPANY_URL = "https://api.checko.ru/v2/company"
 FINANCES_URL = "https://api.checko.ru/v2/finances"
 
 
-def request_checko(url: str, params: dict):
-    with httpx.Client(timeout=20) as client:
+async def request_checko(url: str, params: dict):
+    async with httpx.AsyncClient(timeout=20) as client:
         try:
-            response = client.get(url, params=params)
+            response = await client.get(url, params=params)
             response.raise_for_status()
             return response.json()
 
@@ -60,13 +63,13 @@ def sync_companies(okved_code: str, session):
         save_company_if_not_exists(session, company_data)
 
 
-def get_company_contacts(inn: str):
+async def get_company_contacts(inn: str):
     """Получаем по ИНН контакты"""
     params = {
         "key": settings.CHECKO_API_KEY,
         "inn": inn,
     }
-    return request_checko(COMPANY_URL, params)
+    return await request_checko(COMPANY_URL, params)
 
 
 def parse_contacts(data: dict):
@@ -94,10 +97,10 @@ def parse_contacts(data: dict):
     }
 
 
-def update_company_contacts(session, company):
+async def update_company_contacts(db: AsyncSession, company: Company):
     if not company:
         return
-    new_data = get_company_contacts(company.inn)
+    new_data = await get_company_contacts(company.inn)
     contacts = parse_contacts(new_data)
 
     company.phone = contacts["phone"]
@@ -106,13 +109,13 @@ def update_company_contacts(session, company):
     company.region = contacts["region"]
 
 
-def get_company_finances(inn: str):
+async def get_company_finances(inn: str):
     params = {
         "key": settings.CHECKO_API_KEY,
         "inn": inn,
         "extended": "true",
     }
-    return request_checko(FINANCES_URL, params)
+    return await request_checko(FINANCES_URL, params)
 
 
 def parse_finances(data: dict):
