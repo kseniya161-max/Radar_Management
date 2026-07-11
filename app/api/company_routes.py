@@ -23,13 +23,13 @@ router = APIRouter(tags=["Companies"])
 
 
 @router.get("/companies", response_model=SCompanyPageResponse)
-def all_companies(
+async def all_companies(
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     """Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
-    return get_all_companies(db, limit, offset)
+    return await get_all_companies(db, limit, offset)
 
 
 @router.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
@@ -62,9 +62,9 @@ def update_contacts(inn: str, db: Session = Depends(get_db)):
 
 
 @router.get("/companies/{inn}", response_model=SCompanyResponse)
-def get_company(inn: str, db: Session = Depends(get_db)):
+async def get_company(inn: str, db: AsyncSession = Depends(get_db)):
     """Эндпоинт получения информации по компании по ИНН"""
-    company = get_company_by_inn(db, inn)
+    company = await get_company_by_inn(db, inn)
     return company
 
 

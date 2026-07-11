@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
@@ -93,13 +93,30 @@ def growth_calc(current: int | None, previous: int | None) -> float | None:
     return round((current - previous) / abs(previous) * 100, 1)
 
 
-def get_all_companies(db: Session, limit: int, offset: int):
-    total = db.query(Company).count()
-    companies = db.query(Company).offset(offset).limit(limit).all()
-    return {"total": total,
-            "limit": limit,
-            "offset": offset,
-            "items": [company_to_dict(company) for company in companies],}
+async def get_all_companies(
+    db: AsyncSession,
+    limit: int,
+    offset: int,
+):
+
+    total_stmt = select(func.count()).select_from(Company)
+    total = await db.scalar(total_stmt)
+    stmt = (
+        select(Company)
+        .offset(offset)
+        .limit(limit)
+    )
+    result = await db.execute(stmt)
+
+    companies = result.scalars().all()
+    return {
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "items": [company_to_dict(company) for company in companies],
+    }
+
+
 
 
 def company_to_dict(company: Company) -> dict:
