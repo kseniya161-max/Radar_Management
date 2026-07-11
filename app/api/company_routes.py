@@ -44,11 +44,11 @@ def create_companies(okved_code: str, db: Session = Depends(get_db)):
 
 
 @router.post("/companies/{inn}/finance", response_model=SCompanyStatusResponse)
-def update_finance(inn: str, db: Session = Depends(get_db)):
+async def update_finance(inn: str, db: AsyncSession = Depends(get_db)):
     """Обогащение финансами по ИНН"""
-    company = get_company_by_inn(db, inn)
-    update_company_finances(db, company)
-    db.commit()
+    company = await get_company_by_inn(db, inn)
+    await update_company_finances(db, company)
+    await db.commit()
     return {"status": "ok"}
 
 

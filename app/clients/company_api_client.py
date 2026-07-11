@@ -11,10 +11,10 @@ COMPANY_URL = "https://api.checko.ru/v2/company"
 FINANCES_URL = "https://api.checko.ru/v2/finances"
 
 
-def request_checko(url: str, params: dict):
-    with httpx.Client(timeout=20) as client:
+async def request_checko(url: str, params: dict):
+    async with httpx.AsyncClient(timeout=20) as client:
         try:
-            response = client.get(url, params=params)
+            response = await client.get(url, params=params)
             response.raise_for_status()
             return response.json()
 
@@ -107,13 +107,13 @@ def update_company_contacts(session, company):
     company.region = contacts["region"]
 
 
-def get_company_finances(inn: str):
+async def get_company_finances(inn: str):
     params = {
         "key": settings.CHECKO_API_KEY,
         "inn": inn,
         "extended": "true",
     }
-    return request_checko(FINANCES_URL, params)
+    return await request_checko(FINANCES_URL, params)
 
 
 def parse_finances(data: dict):

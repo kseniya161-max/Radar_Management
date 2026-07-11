@@ -40,10 +40,10 @@ async def get_company_by_inn(db: AsyncSession, inn: str) -> Company:
     return company
 
 
-def update_company_finances(session, company):
+async def update_company_finances(db: AsyncSession, company: Company):
     if not company:
         return
-    new_data = get_company_finances(company.inn)
+    new_data = await get_company_finances(company.inn)
     finances = parse_finances(new_data)
 
     company.revenue_2024 = finances["revenue_2024"]
