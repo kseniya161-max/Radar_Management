@@ -54,7 +54,7 @@ async def update_company_finances(db: AsyncSession, company: Company):
     company.profit_2025 = finances["profit_2025"]
 
 
-def enrich_company_data(session, company):
+async def enrich_company_data(session, company):
     try:
         update_company_contacts(session, company)
     except CheckoAPIError as e:

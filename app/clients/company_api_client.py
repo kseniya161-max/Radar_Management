@@ -1,5 +1,7 @@
 import httpx
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.exceptions.checko import CheckoAPIError
 from app.core.config import settings
 from app.models.company import Company
@@ -61,13 +63,13 @@ def sync_companies(okved_code: str, session):
         save_company_if_not_exists(session, company_data)
 
 
-def get_company_contacts(inn: str):
+async def get_company_contacts(inn: str):
     """Получаем по ИНН контакты"""
     params = {
         "key": settings.CHECKO_API_KEY,
         "inn": inn,
     }
-    return request_checko(COMPANY_URL, params)
+    return await request_checko(COMPANY_URL, params)
 
 
 def parse_contacts(data: dict):
@@ -95,10 +97,10 @@ def parse_contacts(data: dict):
     }
 
 
-def update_company_contacts(session, company):
+async def update_company_contacts(db: AsyncSession, company: Company):
     if not company:
         return
-    new_data = get_company_contacts(company.inn)
+    new_data = await get_company_contacts(company.inn)
     contacts = parse_contacts(new_data)
 
     company.phone = contacts["phone"]
