@@ -8,7 +8,8 @@ from app.schemas.company import (
     SCompanyAiScoreResponse,
     SCompanyScoreAllResponse,
 )
-from app.services.ai_service import score_company, score_all_companies
+from app.services.ai_service import score_company
+from app.tasks.ai_tasks import score_all_companies_task
 
 router = APIRouter(tags=["AI"])
 
@@ -42,14 +43,10 @@ def ai_score_company(inn: str, db: Session = Depends(get_db)):
 
 
 @router.post("/companies/ai_score_all", response_model=SCompanyScoreAllResponse)
-def ai_score_company_all(db: Session = Depends(get_db)):
-    result = score_all_companies(db)
-
-    db.commit()
+def ai_score_company_all():
+    task = score_all_companies_task.delay()
 
     return {
-        "status": "ok",
-        "total": result["total"],
-        "processed": result["processed"],
-        "failed": result["total"] - result["processed"],
+        "status": "started",
+        "task_id": task.id,
     }

@@ -16,11 +16,10 @@ from app.exceptions.company_exc import CompanyNotFoundError
 from app.models.company import Company
 
 
-def save_company_if_not_exists(session, company_data):
+async def save_company_if_not_exists(session: AsyncSession, company_data):
     inn = company_data["inn"]
-    company = session.execute(
-        select(Company).where(Company.inn == inn)
-    ).scalar_one_or_none()
+    result = await session.execute(select(Company).where(Company.inn == inn))
+    company = result.scalar_one_or_none()
 
     if company:
         return company
@@ -54,9 +53,9 @@ async def update_company_finances(db: AsyncSession, company: Company):
     company.profit_2025 = finances["profit_2025"]
 
 
-async def enrich_company_data(session, company):
+async def enrich_company_data(session: AsyncSession, company: Company):
     try:
-        update_company_contacts(session, company)
+        await update_company_contacts(session, company)
     except CheckoAPIError as e:
         logger.warning(
             "Failed to update contacts for %s: %s",
@@ -64,7 +63,7 @@ async def enrich_company_data(session, company):
             e,
         )
     try:
-        update_company_finances(session, company)
+        await update_company_finances(session, company)
     except CheckoAPIError as e:
         logger.warning(
             "Failed to update finances for %s: %s",
@@ -73,14 +72,14 @@ async def enrich_company_data(session, company):
         )
 
 
-def sync_and_enrich_companies(okved_code: str, session):
-    data = search_companies_by_okved(okved_code)
+async def sync_and_enrich_companies(okved_code: str, session: AsyncSession):
+    data = await search_companies_by_okved(okved_code)
 
     for raw_company in data["data"]["Записи"]:
         company_data = parse_company(raw_company)
-        company = save_company_if_not_exists(session, company_data)
+        company = await save_company_if_not_exists(session, company_data)
 
-        enrich_company_data(session, company)
+        await enrich_company_data(session, company)
 
 
 def growth_calc(current: int | None, previous: int | None) -> float | None:
@@ -101,11 +100,7 @@ async def get_all_companies(
 
     total_stmt = select(func.count()).select_from(Company)
     total = await db.scalar(total_stmt)
-    stmt = (
-        select(Company)
-        .offset(offset)
-        .limit(limit)
-    )
+    stmt = select(Company).offset(offset).limit(limit)
     result = await db.execute(stmt)
 
     companies = result.scalars().all()
@@ -115,8 +110,6 @@ async def get_all_companies(
         "offset": offset,
         "items": [company_to_dict(company) for company in companies],
     }
-
-
 
 
 def company_to_dict(company: Company) -> dict:

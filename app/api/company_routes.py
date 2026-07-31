@@ -9,7 +9,8 @@ from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,
     SCompanyStatusResponse,
-    SCompanyResponse, SCompanyPageResponse,
+    SCompanyResponse,
+    SCompanyPageResponse,
 )
 from app.services.company_service import (
     update_company_finances,
@@ -33,10 +34,10 @@ async def all_companies(
 
 
 @router.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
-def create_companies(okved_code: str, db: Session = Depends(get_db)):
+async def create_companies(okved_code: str, db: AsyncSession = Depends(get_db)):
     """Получение компаний по оквед"""
-    sync_companies(okved_code, db)
-    db.commit()
+    await sync_companies(okved_code, db)
+    await db.commit()
     return {
         "status": "ok",
         "message": f"Синхронизация для ОКВЭД {okved_code} завершена",
@@ -69,19 +70,19 @@ async def get_company(inn: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/companies/{inn}/enrich", response_model=SCompanyStatusResponse)
-def enrich_company(inn: str, db: Session = Depends(get_db)):
+async def enrich_company(inn: str, db: AsyncSession = Depends(get_db)):
     """Обогащения по инн"""
-    company = get_company_by_inn(db, inn)
-    enrich_company_data(db, company)
-    db.commit()
+    company = await get_company_by_inn(db, inn)
+    await enrich_company_data(db, company)
+    await db.commit()
     return {"status": "ok"}
 
 
 @router.post("/sync/{okved_code}/", response_model=SCompanyMessageResponse)
-def sync_company(okved_code: str, db: Session = Depends(get_db)):
+async def sync_company(okved_code: str, db: AsyncSession = Depends(get_db)):
     """Обогащение по оквед"""
-    sync_and_enrich_companies(okved_code, db)
-    db.commit()
+    await sync_and_enrich_companies(okved_code, db)
+    await db.commit()
     return {
         "status": "ok",
         "message": f"Компании по ОКВЭД {okved_code} загружены и обогащены",

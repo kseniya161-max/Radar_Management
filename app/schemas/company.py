@@ -90,4 +90,3 @@ class SCompanyPageResponse(BaseModel):
     limit: int
     offset: int
     items: list[SCompanyListResponse]
-
