@@ -2,6 +2,7 @@ import json
 import re
 
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from app.clients.ai_client import ask_ai
@@ -52,21 +53,22 @@ def extract_json(text: str | None) -> dict:
         return {"error": "json_decode_error", "raw": text}
 
 
-def score_company(company: Company) -> dict:
+async def score_company(company: Company) -> dict:
     prompt = build_company_prompt(company)
     ai_response = ask_ai(prompt)
     parsed = extract_json(ai_response)
     return {"inn": company.inn, "name": company.name, "ai_score": parsed}
 
 
-def score_all_companies(db: Session):
-    companies = db.scalars(select(Company)).all()
+async def score_all_companies(db: AsyncSession):
+    result = await db.execute(select(Company))
+    companies = result.scalars().all()
 
     results = []
 
     for company in companies:
         try:
-            result = score_company(company)
+            result = await score_company(company)
             if not result:
                 continue
 
