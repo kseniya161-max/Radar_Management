@@ -12,6 +12,8 @@
 - API (роутеры FastAPI);
 - сервисный слой (бизнес-логика);
 - клиенты внешних API (Checko API, OpenRouter);
+- асинхронный слой доступа к данным (SQLAlchemy AsyncSession);
+- фоновые задачи (Celery + Redis).
 - слой работы с базой данных (SQLAlchemy ORM);
 - Pydantic-схемы (валидация и сериализация данных);
 - централизованная обработка исключений.
@@ -33,6 +35,8 @@
 * Строгая типизация API через Pydantic Response Models с автоматической валидацией ответов и документацией Swagger.
 
 * HTTP-запросы (httpx) для высокой производительности.
+
+* Асинхронная обработка запросов (FastAPI + Async SQLAlchemy + httpx.AsyncClient) для неблокирующей работы с базой данных и внешними API.
 
 * **AI‑оценка (скоринг) компаний** через OpenRouter – автоматический расчёт приоритетности лида на основе финансовых показателей,
 
@@ -57,9 +61,15 @@
 
 * httpx – HTTP‑клиент
 
+* httpx.AsyncClient – асинхронный HTTP-клиент для интеграции с внешними API
+
 * Pydantic – схемы запросов и ответов (Request/Response Models), валидация данных и генерация OpenAPI/Swagger документации.
 
 * Alembic – миграции схемы БД
+
+** Celery – выполнение длительных фоновых задач
+
+* Redis – брокер сообщений для Celery
 
 * **OpenRouter** – агрегатор LLM (Gemma др.) для AI‑аналитики
 
@@ -83,6 +93,7 @@ pip install -r requirements.txt
 CHECKO_API_KEY=ваш_api_ключ_с_сайта_checko.ru
 DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/radarmanagement
 OPENROUTER_API_KEY= ваш ключ с openrouter.ai
+REDIS_URL=redis://localhost:6379/0
 
 # Создать базу данных PostgreSQL
 
@@ -94,6 +105,15 @@ alembic upgrade head
 
 # Запустить сервер FastAPI
 uvicorn app.main:app --reload
+
+# Запустить Redis
+
+redis-server
+
+# Запустить Celery Worker
+
+celery -A app.celery_app.celery worker --loglevel=info
+
 
 Swagger UI будет доступен по адресу http://127.0.0.1:8000/docs
 
@@ -180,4 +200,14 @@ POST    /sync/{okved_code} Загрузить компании по ОКВЭД �
 - преобразование транспортных ошибок в собственные исключения приложения;
 - повторное использование единой логики всеми интеграциями с Checko API.
 
-   
+ ## Асинхронная архитектура
+
+Проект использует асинхронную модель обработки запросов на базе FastAPI и SQLAlchemy AsyncSession.
+
+Асинхронный подход применяется для:
+
+- работы с PostgreSQL через AsyncSession;
+- HTTP-запросов к Checko API через httpx.AsyncClient;
+- обработки нескольких входящих запросов без блокировки сервера.
+
+Это позволяет эффективнее использовать ресурсы приложения при одновременной работе с базой данных и внешними сервисами.  

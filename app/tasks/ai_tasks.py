@@ -5,7 +5,6 @@ from app.services.ai_service import score_all_companies
 from app.database.db import SessionLocal
 
 
-
 @celery.task
 def score_all_companies_task():
 

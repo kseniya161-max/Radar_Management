@@ -18,9 +18,7 @@ from app.models.company import Company
 
 async def save_company_if_not_exists(session: AsyncSession, company_data):
     inn = company_data["inn"]
-    result = await session.execute(
-        select(Company).where(Company.inn == inn)
-    )
+    result = await session.execute(select(Company).where(Company.inn == inn))
     company = result.scalar_one_or_none()
 
     if company:
@@ -102,11 +100,7 @@ async def get_all_companies(
 
     total_stmt = select(func.count()).select_from(Company)
     total = await db.scalar(total_stmt)
-    stmt = (
-        select(Company)
-        .offset(offset)
-        .limit(limit)
-    )
+    stmt = select(Company).offset(offset).limit(limit)
     result = await db.execute(stmt)
 
     companies = result.scalars().all()
@@ -116,8 +110,6 @@ async def get_all_companies(
         "offset": offset,
         "items": [company_to_dict(company) for company in companies],
     }
-
-
 
 
 def company_to_dict(company: Company) -> dict:

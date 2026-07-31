@@ -9,7 +9,8 @@ from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,
     SCompanyStatusResponse,
-    SCompanyResponse, SCompanyPageResponse,
+    SCompanyResponse,
+    SCompanyPageResponse,
 )
 from app.services.company_service import (
     update_company_finances,
