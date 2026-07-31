@@ -33,10 +33,10 @@ async def all_companies(
 
 
 @router.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
-def create_companies(okved_code: str, db: Session = Depends(get_db)):
+async def create_companies(okved_code: str, db: AsyncSession = Depends(get_db)):
     """Получение компаний по оквед"""
-    sync_companies(okved_code, db)
-    db.commit()
+    await sync_companies(okved_code, db)
+    await db.commit()
     return {
         "status": "ok",
         "message": f"Синхронизация для ОКВЭД {okved_code} завершена",

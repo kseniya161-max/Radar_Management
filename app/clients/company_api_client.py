@@ -54,7 +54,7 @@ def parse_company(raw_company: dict):
     }
 
 
-def sync_companies(okved_code: str, session):
+async def sync_companies(okved_code: str, session):
     """Получает данные Checko API Парсит каждую компанию Сохраняет в БД(если ещё нет)"""
     data = search_companies_by_okved(okved_code)
     logger.info("Received %s companies", len(data["data"]["Записи"]))
