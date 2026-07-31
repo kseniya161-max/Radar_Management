@@ -16,11 +16,12 @@ from app.exceptions.company_exc import CompanyNotFoundError
 from app.models.company import Company
 
 
-def save_company_if_not_exists(session, company_data):
+async def save_company_if_not_exists(session: AsyncSession, company_data):
     inn = company_data["inn"]
-    company = session.execute(
+    result = await session.execute(
         select(Company).where(Company.inn == inn)
-    ).scalar_one_or_none()
+    )
+    company = result.scalar_one_or_none()
 
     if company:
         return company
