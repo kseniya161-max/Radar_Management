@@ -69,11 +69,11 @@ async def get_company(inn: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/companies/{inn}/enrich", response_model=SCompanyStatusResponse)
-def enrich_company(inn: str, db: Session = Depends(get_db)):
+async def enrich_company(inn: str, db: AsyncSession = Depends(get_db)):
     """Обогащения по инн"""
-    company = get_company_by_inn(db, inn)
-    enrich_company_data(db, company)
-    db.commit()
+    company = await get_company_by_inn(db, inn)
+    await enrich_company_data(db, company)
+    await db.commit()
     return {"status": "ok"}
 
 
