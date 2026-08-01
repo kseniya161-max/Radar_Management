@@ -54,4 +54,3 @@ def ai_score_company_all():
     }
 
 
-# response_model=SCompanyScoreAllResponse
