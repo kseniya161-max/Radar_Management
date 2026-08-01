@@ -90,3 +90,8 @@ class SCompanyPageResponse(BaseModel):
     limit: int
     offset: int
     items: list[SCompanyListResponse]
+
+
+class SCompanyTaskResponse(BaseModel):
+    status: str
+    task_id: str

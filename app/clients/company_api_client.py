@@ -6,7 +6,7 @@ from app.exceptions.checko import CheckoAPIError
 from app.core.config import settings
 from app.models.company import Company
 from app.core.logger import logger
-from app.services.company_service import save_company_if_not_exists
+
 
 BASE_URL = "https://api.checko.ru/v2/search"
 COMPANY_URL = "https://api.checko.ru/v2/company"
@@ -55,6 +55,7 @@ def parse_company(raw_company: dict):
 
 
 async def sync_companies(okved_code: str, session: AsyncSession):
+    from app.services.company_service import save_company_if_not_exists
     """Получает данные Checko API Парсит каждую компанию Сохраняет в БД(если ещё нет)"""
     data = await search_companies_by_okved(okved_code)
     logger.info("Received %s companies", len(data["data"]["Записи"]))

@@ -5,6 +5,11 @@ from app.services.ai_service import score_all_companies
 from app.database.db import SessionLocal
 
 
+asyncio.set_event_loop_policy(
+    asyncio.WindowsSelectorEventLoopPolicy()
+)
+
+
 @celery.task
 def score_all_companies_task():
 
