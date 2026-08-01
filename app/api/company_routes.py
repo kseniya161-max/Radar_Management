@@ -1,5 +1,4 @@
-from fastapi import Depends
-from sqlalchemy.orm import Session, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.clients.company_api_client import sync_companies, update_company_contacts
@@ -25,8 +24,8 @@ router = APIRouter(tags=["Companies"])
 
 @router.get("/companies", response_model=SCompanyPageResponse)
 async def all_companies(
-    limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ):
     """Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
