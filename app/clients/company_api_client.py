@@ -37,7 +37,7 @@ async def search_companies_by_okved(okved_code: str):
         "by": "okved",
         "obj": "org",
         "query": okved_code,
-        "limit": 2,
+        "limit": 5,
         "active": "true",
     }
     return await request_checko(BASE_URL, params)
