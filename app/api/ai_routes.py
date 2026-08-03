@@ -1,8 +1,8 @@
 from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 from app.database.db import get_db
+from app.exceptions.ai import AiAPIError
 from app.models.company import Company
 from app.schemas.company import (
     SCompanyRankedResponse,
@@ -11,6 +11,7 @@ from app.schemas.company import (
 )
 from app.services.ai_service import score_company
 from app.tasks.ai_tasks import score_all_companies_task
+from app.exceptions.ai import AiAPIError
 
 router = APIRouter(tags=["AI"])
 
@@ -41,9 +42,14 @@ async def ai_score_company(inn: str, db: AsyncSession = Depends(get_db)):
     company = result.scalar_one_or_none()
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
-    return await score_company(company)
+    try:
+        return await score_company(company)
 
-
+    except AiAPIError as e:
+        raise HTTPException(
+            status_code=503,
+            detail=str(e),
+        )
 @router.post("/companies/ai_score_all", response_model=SCompanyTaskResponse)
 def ai_score_company_all():
     task = score_all_companies_task.delay()

@@ -16,7 +16,6 @@ def score_all_companies_task():
     async def run():
         async with SessionLocal() as db:
             result = await score_all_companies(db)
-            await db.commit()
             return result
 
     return asyncio.run(run())
