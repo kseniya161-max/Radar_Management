@@ -2,7 +2,6 @@ from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.db import get_db
-from app.exceptions.ai import AiAPIError
 from app.models.company import Company
 from app.schemas.company import (
     SCompanyRankedResponse,

@@ -8,8 +8,7 @@ app = FastAPI(
     description="KSENIA TEST 778",
     version="0.1.0",
 )
-
-app.include_router(company_routes)
 app.include_router(ai_routes)
+app.include_router(company_routes)
 app.include_router(task_routes)
 
