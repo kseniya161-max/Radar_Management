@@ -90,6 +90,7 @@ async def score_all_companies(db: AsyncSession):
                 e,
             )
             continue
+    await db.commit()
 
     return {
         "total": len(companies),

@@ -7,7 +7,6 @@ from app.core.config import settings
 from app.models.company import Company
 from app.core.logger import logger
 
-
 BASE_URL = "https://api.checko.ru/v2/search"
 COMPANY_URL = "https://api.checko.ru/v2/company"
 FINANCES_URL = "https://api.checko.ru/v2/finances"
@@ -37,7 +36,7 @@ async def search_companies_by_okved(okved_code: str):
         "by": "okved",
         "obj": "org",
         "query": okved_code,
-        "limit": 2,
+        "limit": 5,
         "active": "true",
     }
     return await request_checko(BASE_URL, params)
@@ -56,6 +55,7 @@ def parse_company(raw_company: dict):
 
 async def sync_companies(okved_code: str, session: AsyncSession):
     from app.services.company_service import save_company_if_not_exists
+
     """Получает данные Checko API Парсит каждую компанию Сохраняет в БД(если ещё нет)"""
     data = await search_companies_by_okved(okved_code)
     logger.info("Received %s companies", len(data["data"]["Записи"]))
