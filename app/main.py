@@ -5,7 +5,11 @@ from app.api.task_routes import router as task_routes
 from app.exceptions.ai import AiAPIError
 from app.exceptions.checko import CheckoAPIError
 from app.exceptions.company_exc import CompanyNotFoundError
-from app.exceptions.handlers import company_exception_handler, checko_exception_handler, ai_exception_handler
+from app.exceptions.handlers import (
+    company_exception_handler,
+    checko_exception_handler,
+    ai_exception_handler,
+)
 
 print("LOADED MAIN 999")
 app = FastAPI(
