@@ -22,7 +22,9 @@ class Company(Base):
     registration_date: Mapped[str] = mapped_column(
         String(255), nullable=True, default=None
     )
-    region: Mapped[str] = mapped_column(String(255), nullable=True, default=None, index=True)
+    region: Mapped[str] = mapped_column(
+        String(255), nullable=True, default=None, index=True
+    )
     profit_2023: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     profit_2024: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     profit_2025: Mapped[int | None] = mapped_column(BigInteger, nullable=True)

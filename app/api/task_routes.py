@@ -3,7 +3,6 @@ from celery.result import AsyncResult
 
 from app.celery_app import celery
 
-
 router = APIRouter(tags=["Tasks"])
 
 
