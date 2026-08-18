@@ -13,10 +13,15 @@ from app.services.ai_service import score_company
 from app.tasks.ai_tasks import score_all_companies_task
 from app.exceptions.ai import AiAPIError
 
-router = APIRouter(tags=["AI"])
 
 
-@router.get("/companies/ai_ranked", response_model=list[SCompanyRankedResponse])
+router_ai = APIRouter(
+    prefix="/companies",
+    tags=["AI"]
+)
+
+
+@router_ai.get("/ai_ranked", response_model=list[SCompanyRankedResponse])
 async def get_ranked(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Company))
     companies = result.scalars().all()
@@ -36,7 +41,7 @@ async def get_ranked(db: AsyncSession = Depends(get_db)):
     ]
 
 
-@router.post("/companies/{inn}/ai_score", response_model=SCompanyAiScoreResponse)
+@router_ai.post("/{inn}/ai_score", response_model=SCompanyAiScoreResponse)
 async def ai_score_company(inn: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Company).where(Company.inn == inn))
     company = result.scalar_one_or_none()
@@ -52,7 +57,7 @@ async def ai_score_company(inn: str, db: AsyncSession = Depends(get_db)):
         )
 
 
-@router.post("/companies/ai_score_all", response_model=SCompanyTaskResponse)
+@router_ai.post("/ai_score_all", response_model=SCompanyTaskResponse)
 def ai_score_company_all():
     task = score_all_companies_task.delay()
 

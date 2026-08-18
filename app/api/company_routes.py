@@ -19,10 +19,14 @@ from app.services.company_service import (
     get_all_companies,
 )
 
-router = APIRouter(tags=["Companies"])
+
+router_companies  = APIRouter(
+    prefix="/companies",
+    tags=["Companies"]
+)
 
 
-@router.get("/companies", response_model=SCompanyPageResponse)
+@router_companies.get("/companies", response_model=SCompanyPageResponse)
 async def all_companies(
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
@@ -32,7 +36,7 @@ async def all_companies(
     return await get_all_companies(db, limit, offset)
 
 
-@router.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
+@router_companies.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
 async def create_companies(okved_code: str, db: AsyncSession = Depends(get_db)):
     """Получение компаний по оквед"""
     await sync_companies(okved_code, db)
@@ -43,7 +47,7 @@ async def create_companies(okved_code: str, db: AsyncSession = Depends(get_db)):
     }
 
 
-@router.post("/companies/{inn}/finance", response_model=SCompanyStatusResponse)
+@router_companies.post("/companies/{inn}/finance", response_model=SCompanyStatusResponse)
 async def update_finance(inn: str, db: AsyncSession = Depends(get_db)):
     """Обогащение финансами по ИНН"""
     company = await get_company_by_inn(db, inn)
@@ -52,7 +56,7 @@ async def update_finance(inn: str, db: AsyncSession = Depends(get_db)):
     return {"status": "ok"}
 
 
-@router.post("/companies/{inn}/contacts", response_model=SCompanyStatusResponse)
+@router_companies.post("/companies/{inn}/contacts", response_model=SCompanyStatusResponse)
 async def update_contacts(inn: str, db: AsyncSession = Depends(get_db)):
     """Обогащение контактами по ИНН"""
     company = await get_company_by_inn(db, inn)
@@ -61,14 +65,14 @@ async def update_contacts(inn: str, db: AsyncSession = Depends(get_db)):
     return {"status": "ok"}
 
 
-@router.get("/companies/{inn}", response_model=SCompanyResponse)
+@router_companies.get("/companies/{inn}", response_model=SCompanyResponse)
 async def get_company(inn: str, db: AsyncSession = Depends(get_db)):
     """Эндпоинт получения информации по компании по ИНН"""
     company = await get_company_by_inn(db, inn)
     return company
 
 
-@router.post("/companies/{inn}/enrich", response_model=SCompanyStatusResponse)
+@router_companies.post("/companies/{inn}/enrich", response_model=SCompanyStatusResponse)
 async def enrich_company(inn: str, db: AsyncSession = Depends(get_db)):
     """Обогащения по инн контактами и финансами сразу"""
     company = await get_company_by_inn(db, inn)
@@ -77,7 +81,7 @@ async def enrich_company(inn: str, db: AsyncSession = Depends(get_db)):
     return {"status": "ok"}
 
 
-@router.post("/sync/{okved_code}/", response_model=SCompanyMessageResponse)
+@router_companies.post("/sync/{okved_code}/", response_model=SCompanyMessageResponse)
 async def sync_company(okved_code: str, db: AsyncSession = Depends(get_db)):
     """Обогащение по оквед"""
     await sync_and_enrich_companies(okved_code, db)

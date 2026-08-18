@@ -1,7 +1,6 @@
-from fastapi import HTTPException
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
+
 
 from app.clients.company_api_client import (
     get_company_finances,
