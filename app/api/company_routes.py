@@ -1,8 +1,6 @@
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
-
+from fastapi import APIRouter, Query
 from app.clients.company_api_client import sync_companies, update_company_contacts
-from app.database.db import get_db
+from app.database.db import SessionDep
 from fastapi import APIRouter
 from app.schemas.company import (
     SCompanyListResponse,
@@ -26,66 +24,67 @@ router_companies  = APIRouter(
 )
 
 
-@router_companies.get("/companies", response_model=SCompanyPageResponse)
+@router_companies.get("", response_model=SCompanyPageResponse)
 async def all_companies(
+    session: SessionDep,
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    db: AsyncSession = Depends(get_db),
+
 ):
     """Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
-    return await get_all_companies(db, limit, offset)
+    return await get_all_companies(session, limit, offset)
 
 
 @router_companies.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
-async def create_companies(okved_code: str, db: AsyncSession = Depends(get_db)):
+async def create_companies(okved_code: str, session: SessionDep):
     """Получение компаний по оквед"""
-    await sync_companies(okved_code, db)
-    await db.commit()
+    await sync_companies(okved_code, session)
+    await session.commit()
     return {
         "status": "ok",
         "message": f"Синхронизация для ОКВЭД {okved_code} завершена",
     }
 
 
-@router_companies.post("/companies/{inn}/finance", response_model=SCompanyStatusResponse)
-async def update_finance(inn: str, db: AsyncSession = Depends(get_db)):
+@router_companies.post("/{inn}/finance", response_model=SCompanyStatusResponse)
+async def update_finance(inn: str, session: SessionDep):
     """Обогащение финансами по ИНН"""
-    company = await get_company_by_inn(db, inn)
-    await update_company_finances(db, company)
-    await db.commit()
+    company = await get_company_by_inn(session, inn)
+    await update_company_finances(session, company)
+    await session.commit()
     return {"status": "ok"}
 
 
-@router_companies.post("/companies/{inn}/contacts", response_model=SCompanyStatusResponse)
-async def update_contacts(inn: str, db: AsyncSession = Depends(get_db)):
+@router_companies.post("/{inn}/contacts", response_model=SCompanyStatusResponse)
+async def update_contacts(inn: str, session: SessionDep):
     """Обогащение контактами по ИНН"""
-    company = await get_company_by_inn(db, inn)
-    await update_company_contacts(db, company)
-    await db.commit()
+    company = await get_company_by_inn(session, inn)
+    await update_company_contacts(session, company)
+    await session.commit()
     return {"status": "ok"}
 
 
-@router_companies.get("/companies/{inn}", response_model=SCompanyResponse)
-async def get_company(inn: str, db: AsyncSession = Depends(get_db)):
+@router_companies.get("/{inn}", response_model=SCompanyResponse)
+async def get_company(inn: str, session: SessionDep):
     """Эндпоинт получения информации по компании по ИНН"""
-    company = await get_company_by_inn(db, inn)
+    company = await get_company_by_inn(session, inn)
     return company
 
 
-@router_companies.post("/companies/{inn}/enrich", response_model=SCompanyStatusResponse)
-async def enrich_company(inn: str, db: AsyncSession = Depends(get_db)):
+@router_companies.post("/{inn}/enrich", response_model=SCompanyStatusResponse)
+async def enrich_company(inn: str, session: SessionDep):
     """Обогащения по инн контактами и финансами сразу"""
-    company = await get_company_by_inn(db, inn)
-    await enrich_company_data(db, company)
-    await db.commit()
+    company = await get_company_by_inn(session, inn)
+    await enrich_company_data(session, company)
+    await session.commit()
     return {"status": "ok"}
 
 
 @router_companies.post("/sync/{okved_code}/", response_model=SCompanyMessageResponse)
-async def sync_company(okved_code: str, db: AsyncSession = Depends(get_db)):
+async def sync_company(okved_code: str, session: SessionDep):
     """Обогащение по оквед"""
-    await sync_and_enrich_companies(okved_code, db)
-    await db.commit()
+    await sync_and_enrich_companies(okved_code, session)
+    await session.commit()
     return {
         "status": "ok",
         "message": f"Компании по ОКВЭД {okved_code} загружены и обогащены",
