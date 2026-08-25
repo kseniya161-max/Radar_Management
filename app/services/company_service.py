@@ -114,8 +114,8 @@ async def enrich_company_data(session: AsyncSession, company: Company):
         )
 
 
-async def sync_and_enrich_companies(okved_code: str, session: AsyncSession):
-    data = await search_companies_by_okved(okved_code)
+async def sync_and_enrich_companies(okved_code: str, session: AsyncSession, page: int = 1):
+    data = await search_companies_by_okved(okved_code,page)
 
     for raw_company in data["data"]["Записи"]:
         company_data = parse_company(raw_company)

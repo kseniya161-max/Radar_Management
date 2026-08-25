@@ -81,9 +81,9 @@ async def enrich_company(inn: str, session: SessionDep):
 
 
 @router_companies.post("/sync/{okved_code}/", response_model=SCompanyMessageResponse)
-async def sync_company(okved_code: str, session: SessionDep):
+async def sync_company(okved_code: str, session: SessionDep,  page: int = Query(1, ge=1)):
     """Обогащение по оквед"""
-    await sync_and_enrich_companies(okved_code, session)
+    await sync_and_enrich_companies(okved_code, session,page)
     await session.commit()
     return {
         "status": "ok",
