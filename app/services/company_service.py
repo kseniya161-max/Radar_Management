@@ -29,19 +29,44 @@ def growth_calc(current: int | None, previous: int | None) -> float | None:
 async def get_all_companies(
     db: AsyncSession,
     limit: int,
-    offset: int,
+    page: int,
 ):
-
     total_stmt = select(func.count()).select_from(Company)
     total = await db.scalar(total_stmt)
-    stmt = select(Company).order_by(case((Company.phone.is_not (None), 1), else_ = 0,)).desc().offset(offset).limit(limit)
-    result = await db.execute(stmt)
 
+    offset = (page - 1) * limit
+
+    priority = case(
+        (
+            Company.phone.is_not(None)
+            & Company.revenue_2024.is_not(None)
+            & Company.revenue_2025.is_not(None),
+            1,
+        ),
+        (
+            Company.phone.is_not(None),
+            2,
+        ),
+        else_=3,
+    )
+
+    stmt = (
+        select(Company)
+        .order_by(
+            priority.asc(),
+            Company.revenue_growth_3.desc().nulls_last(),
+        )
+        .offset(offset)
+        .limit(limit)
+    )
+
+    result = await db.execute(stmt)
     companies = result.scalars().all()
+
     return {
         "total": total,
         "limit": limit,
-        "offset": offset,
+        "page": page,
         "items": companies,
     }
 

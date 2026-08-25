@@ -89,7 +89,7 @@ class SCompanyRankedResponse(BaseModel):
 class SCompanyPageResponse(BaseModel):
     total: int
     limit: int
-    offset: int
+    page: int
     items: list[SCompanyListResponse]
 
 
