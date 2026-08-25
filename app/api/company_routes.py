@@ -28,17 +28,17 @@ router_companies  = APIRouter(
 async def all_companies(
     session: SessionDep,
     limit: int = Query(20, ge=1, le=100),
-    offset: int = Query(0, ge=0),
+    page: int = Query(1, ge=1),
 
 ):
     """Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
-    return await get_all_companies(session, limit, offset)
+    return await get_all_companies(session, limit, page)
 
 
 @router_companies.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
-async def create_companies(okved_code: str, session: SessionDep):
+async def create_companies(okved_code: str, session: SessionDep, page: int = Query(1, ge=1),):
     """Получение компаний по оквед"""
-    await sync_companies(okved_code, session)
+    await sync_companies(okved_code, session, page)
     await session.commit()
     return {
         "status": "ok",

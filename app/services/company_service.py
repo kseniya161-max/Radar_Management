@@ -1,4 +1,4 @@
-from sqlalchemy import select, func
+from sqlalchemy import select, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -34,7 +34,7 @@ async def get_all_companies(
 
     total_stmt = select(func.count()).select_from(Company)
     total = await db.scalar(total_stmt)
-    stmt = select(Company).offset(offset).limit(limit)
+    stmt = select(Company).order_by(case((Company.phone.is_not (None), 1), else_ = 0,)).desc().offset(offset).limit(limit)
     result = await db.execute(stmt)
 
     companies = result.scalars().all()
@@ -48,7 +48,7 @@ async def get_all_companies(
 
 def update_company_growth(company: Company):
     company.revenue_growth_3 = growth_calc(company.revenue_2025, company.revenue_2024)
-    company.profit_growth_3 = growth_calc(company.profit_2025,company.profit_2023)
+    company.profit_growth_3 = growth_calc(company.profit_2025,company.profit_2024)
 
 
 
