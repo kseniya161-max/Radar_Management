@@ -29,7 +29,7 @@ async def request_checko(url: str, params: dict):
             raise CheckoAPIError("No connection to Checko API")
 
 
-async def search_companies_by_okved(okved_code: str, page: int = 1):
+async def search_companies_by_okved(okved_code: str, page: int = 1, region: str | None=None):
     """Делает запрос в API Checko и получает список компаний по ОКВЭД."""
     params = {
         "key": settings.CHECKO_API_KEY,
@@ -40,8 +40,8 @@ async def search_companies_by_okved(okved_code: str, page: int = 1):
         "page": page,
         "active": "true",
     }
-    print("CHECKO PAGE:", page)
-    print("CHECKO PARAMS:", params)
+    if region:
+        params['region'] = region
     return await request_checko(BASE_URL, params)
 
 
