@@ -13,8 +13,8 @@ from app.exceptions.handlers import (
 
 print("LOADED MAIN 998")
 app = FastAPI(
-    title="KSENIA TEST 998",
-    description="KSENIA TEST 778",
+    title="KSENIA TEST 995",
+    description="KSENIA TEST 77",
     version="0.1.0",
 )
 app.include_router(router_ai)
