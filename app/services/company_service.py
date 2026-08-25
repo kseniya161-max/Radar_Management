@@ -46,9 +46,13 @@ async def get_all_companies(
     }
 
 
+def update_company_growth(company: Company):
+    company.revenue_growth_3 = growth_calc(company.revenue_2025, company.revenue_2024)
+    company.profit_growth_3 = growth_calc(company.profit_2025,company.profit_2023)
+
+
+
 def company_to_dict(company: Company) -> dict:
-    growth_profit = growth_calc(company.profit_2025, company.profit_2024)
-    growth_revenue = growth_calc(company.revenue_2025, company.revenue_2024)
     return {
         "id": company.id,
         "inn": company.inn,
@@ -61,8 +65,8 @@ def company_to_dict(company: Company) -> dict:
         "profit_2025": company.profit_2025,
         "profit_2024": company.profit_2024,
         "profit_2023": company.profit_2023,
-        "revenue_growth": growth_revenue,
-        "profit_growth": growth_profit,
+        "revenue_growth": company.revenue_growth_3,
+        "profit_growth": company.profit_growth_3,
         "phone": company.phone,
         "email": company.email,
         "website": company.website,
@@ -73,9 +77,6 @@ def company_to_dict(company: Company) -> dict:
     }
 
 
-def update_company_growth(company: Company):
-    company.revenue_growth_3 = growth_calc(company.revenue_2025, company.revenue_2024)
-    company.profit_growth_3 = growth_calc(company.profit_2025,company.profit_2023)
 
 
 async def save_company_if_not_exists(session: AsyncSession, company_data):
