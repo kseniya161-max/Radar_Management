@@ -29,7 +29,7 @@ async def request_checko(url: str, params: dict):
             raise CheckoAPIError("No connection to Checko API")
 
 
-async def search_companies_by_okved(okved_code: str):
+async def search_companies_by_okved(okved_code: str, page: int = 1, region: str | None=None):
     """Делает запрос в API Checko и получает список компаний по ОКВЭД."""
     params = {
         "key": settings.CHECKO_API_KEY,
@@ -37,8 +37,11 @@ async def search_companies_by_okved(okved_code: str):
         "obj": "org",
         "query": okved_code,
         "limit": 5,
+        "page": page,
         "active": "true",
     }
+    if region:
+        params['region'] = region
     return await request_checko(BASE_URL, params)
 
 
@@ -53,11 +56,11 @@ def parse_company(raw_company: dict):
     }
 
 
-async def sync_companies(okved_code: str, session: AsyncSession):
+async def sync_companies(okved_code: str, session: AsyncSession,  page: int = 1,):
     from app.services.company_service import save_company_if_not_exists
 
     """Получает данные Checko API Парсит каждую компанию Сохраняет в БД(если ещё нет)"""
-    data = await search_companies_by_okved(okved_code)
+    data = await search_companies_by_okved(okved_code, page)
     logger.info("Received %s companies", len(data["data"]["Записи"]))
     for raw_company in data["data"]["Записи"]:
         company_data = parse_company(raw_company)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class SCompanyResponse(BaseModel):
@@ -25,6 +25,7 @@ class SCompanyResponse(BaseModel):
 
 
 class SCompanyListResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     inn: str
     name: str
@@ -43,8 +44,8 @@ class SCompanyListResponse(BaseModel):
     profit_2023: int | None
     profit_2024: int | None
     profit_2025: int | None
-    revenue_growth: float | None
-    profit_growth: float | None
+    revenue_growth_3: float | None
+    profit_growth_3: float | None
 
 
 class SCompanyMessageResponse(BaseModel):
@@ -88,7 +89,7 @@ class SCompanyRankedResponse(BaseModel):
 class SCompanyPageResponse(BaseModel):
     total: int
     limit: int
-    offset: int
+    page: int
     items: list[SCompanyListResponse]
 
 
