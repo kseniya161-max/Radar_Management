@@ -62,7 +62,11 @@ def parse_company(raw_company: dict):
     }
 
 
-async def sync_companies(okved_code: str, session: AsyncSession,  page: int = 1,):
+async def sync_companies(
+    okved_code: str,
+    session: AsyncSession,
+    page: int = 1,
+):
     from app.services.company_service import save_company_if_not_exists
 
     """Получает данные Checko API Парсит каждую компанию Сохраняет в БД(если ещё нет)"""

@@ -9,8 +9,6 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 
-
-
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=True,
@@ -22,6 +20,3 @@ SessionLocal = async_sessionmaker(
     autoflush=False,
     expire_on_commit=False,
 )
-
-
-

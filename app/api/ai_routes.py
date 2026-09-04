@@ -11,12 +11,7 @@ from app.tasks.ai_tasks import score_all_companies_task
 from app.exceptions.ai import AiAPIError
 from app.repositories.company_repository import CompanyRepository
 
-
-
-router_ai = APIRouter(
-    prefix="/companies",
-    tags=["AI"]
-)
+router_ai = APIRouter(prefix="/companies", tags=["AI"])
 
 
 @router_ai.get("/ai_ranked", response_model=list[SCompanyRankedResponse])
