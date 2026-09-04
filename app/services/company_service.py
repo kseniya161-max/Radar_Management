@@ -13,8 +13,7 @@ from app.core.logger import logger
 from app.exceptions.checko import CheckoAPIError
 from app.exceptions.company_exc import CompanyNotFoundError
 from app.models.company import Company
-
-
+from app.repositories.company_repository import CompanyRepository
 
 def growth_calc(current: int | None, previous: int | None) -> float | None:
     if previous is None or current is None:
@@ -31,44 +30,8 @@ async def get_all_companies(
     limit: int,
     page: int,
 ):
-    total_stmt = select(func.count()).select_from(Company)
-    total = await db.scalar(total_stmt)
-
-    offset = (page - 1) * limit
-
-    priority = case(
-        (
-            Company.phone.is_not(None)
-            & Company.revenue_2024.is_not(None)
-            & Company.revenue_2025.is_not(None),
-            1,
-        ),
-        (
-            Company.phone.is_not(None),
-            2,
-        ),
-        else_=3,
-    )
-
-    stmt = (
-        select(Company)
-        .order_by(
-            priority.asc(),
-            Company.revenue_growth_3.desc().nulls_last(),
-        )
-        .offset(offset)
-        .limit(limit)
-    )
-
-    result = await db.execute(stmt)
-    companies = result.scalars().all()
-
-    return {
-        "total": total,
-        "limit": limit,
-        "page": page,
-        "items": companies,
-    }
+    repo = CompanyRepository(db)
+    return await repo.get_all_paginated(limit, page)
 
 
 def update_company_growth(company: Company):
@@ -79,26 +42,19 @@ def update_company_growth(company: Company):
 
 
 async def save_company_if_not_exists(session: AsyncSession, company_data):
-    inn = company_data["inn"]
-    result = await session.execute(select(Company).where(Company.inn == inn))
-    company = result.scalar_one_or_none()
-
-    if company:
-        return company
-
-    company = Company(**company_data)
-    session.add(company)
-    return company
+    repo = CompanyRepository(session)
+    return await repo.save_if_not_exists(company_data)
 
 
 async def get_company_by_inn(db: AsyncSession, inn: str) -> Company:
 
-    company = await db.scalar(select(Company).where(Company.inn == inn))
+    repo = CompanyRepository(db)
+    company = await repo.get_by_inn(inn)
     if not company:
         logger.warning("Company with INN %s not found", inn)
         raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")
-
     return company
+
 
 
 

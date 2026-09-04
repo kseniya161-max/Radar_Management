@@ -1,7 +1,5 @@
 from fastapi import HTTPException, APIRouter
-from sqlalchemy import select
 from app.database.db import SessionDep
-from app.models.company import Company
 from app.schemas.company import (
     SCompanyRankedResponse,
     SCompanyAiScoreResponse,
@@ -11,6 +9,7 @@ from app.schemas.company import (
 from app.services.ai_service import score_company
 from app.tasks.ai_tasks import score_all_companies_task
 from app.exceptions.ai import AiAPIError
+from app.repositories.company_repository import CompanyRepository
 
 
 
@@ -22,8 +21,8 @@ router_ai = APIRouter(
 
 @router_ai.get("/ai_ranked", response_model=list[SCompanyRankedResponse])
 async def get_ranked(session: SessionDep):
-    result = await session.execute(select(Company))
-    companies = result.scalars().all()
+    repo = CompanyRepository(session)
+    companies = await repo.get_all_companies()
     ranked = sorted(companies, key=lambda c: c.ai_priority or 0, reverse=True)
 
     return [
@@ -42,8 +41,8 @@ async def get_ranked(session: SessionDep):
 
 @router_ai.post("/{inn}/ai_score", response_model=SCompanyAiScoreResponse)
 async def ai_score_company(inn: str, session: SessionDep):
-    result = await session.execute(select(Company).where(Company.inn == inn))
-    company = result.scalar_one_or_none()
+    repo = CompanyRepository(session)
+    company = await repo.get_by_inn(inn)
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     try:
