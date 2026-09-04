@@ -11,8 +11,7 @@ class CompanyRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-
-    async def get_by_inn(self, inn:str) -> Company | None:
+    async def get_by_inn(self, inn: str) -> Company | None:
         company = await self.session.execute(select(Company).where(Company.inn == inn))
         return company.scalar_one_or_none()
 
@@ -26,7 +25,8 @@ class CompanyRepository:
         self.session.add(company)
         return company
 
-    async def get_all_paginated(self,
+    async def get_all_paginated(
+        self,
         limit: int,
         page: int,
     ) -> dict:
@@ -68,8 +68,8 @@ class CompanyRepository:
             "page": page,
             "items": companies,
         }
+
     async def get_all_companies(self) -> list[Company]:
 
         result = await self.session.execute(select(Company))
         return result.scalars().all()
-

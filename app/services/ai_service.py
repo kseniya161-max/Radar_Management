@@ -94,4 +94,3 @@ async def score_all_companies(db: AsyncSession):
         "processed": len(results),
         "results": results,
     }
-

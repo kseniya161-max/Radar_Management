@@ -15,6 +15,7 @@ from app.exceptions.company_exc import CompanyNotFoundError
 from app.models.company import Company
 from app.repositories.company_repository import CompanyRepository
 
+
 def growth_calc(current: int | None, previous: int | None) -> float | None:
     if previous is None or current is None:
         return None
@@ -36,9 +37,7 @@ async def get_all_companies(
 
 def update_company_growth(company: Company):
     company.revenue_growth_3 = growth_calc(company.revenue_2025, company.revenue_2024)
-    company.profit_growth_3 = growth_calc(company.profit_2025,company.profit_2024)
-
-
+    company.profit_growth_3 = growth_calc(company.profit_2025, company.profit_2024)
 
 
 async def save_company_if_not_exists(session: AsyncSession, company_data):
@@ -56,9 +55,6 @@ async def get_company_by_inn(db: AsyncSession, inn: str) -> Company:
     return company
 
 
-
-
-
 async def update_company_finances(db: AsyncSession, company: Company):
     if not company:
         return
@@ -73,7 +69,6 @@ async def update_company_finances(db: AsyncSession, company: Company):
     company.profit_2025 = finances["profit_2025"]
 
     update_company_growth(company)
-
 
 
 async def enrich_company_data(session: AsyncSession, company: Company):
@@ -95,13 +90,13 @@ async def enrich_company_data(session: AsyncSession, company: Company):
         )
 
 
-async def sync_and_enrich_companies(okved_code: str, session: AsyncSession, page: int = 1, region: str | None = None):
-    data = await search_companies_by_okved(okved_code,page, region)
+async def sync_and_enrich_companies(
+    okved_code: str, session: AsyncSession, page: int = 1, region: str | None = None
+):
+    data = await search_companies_by_okved(okved_code, page, region)
 
     for raw_company in data["data"]["Записи"]:
         company_data = parse_company(raw_company)
         company = await save_company_if_not_exists(session, company_data)
 
         await enrich_company_data(session, company)
-
-
