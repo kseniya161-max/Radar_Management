@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.company import Company
 
@@ -21,3 +21,46 @@ class CompanyRepository:
         company = Company(**company_data)
         self.session.add(company)
         return company
+
+    async def get_all_paginated(self,
+        limit: int,
+        page: int,
+    ) -> dict:
+        total_stmt = select(func.count()).select_from(Company)
+        total = await self.session.scalar(total_stmt)
+
+        offset = (page - 1) * limit
+
+        priority = case(
+            (
+                Company.phone.is_not(None)
+                & Company.revenue_2024.is_not(None)
+                & Company.revenue_2025.is_not(None),
+                1,
+            ),
+            (
+                Company.phone.is_not(None),
+                2,
+            ),
+            else_=3,
+        )
+
+        stmt = (
+            select(Company)
+            .order_by(
+                priority.asc(),
+                Company.revenue_growth_3.desc().nulls_last(),
+            )
+            .offset(offset)
+            .limit(limit)
+        )
+
+        result = await self.session.execute(stmt)
+        companies = result.scalars().all()
+
+        return {
+            "total": total,
+            "limit": limit,
+            "page": page,
+            "items": companies,
+        }
