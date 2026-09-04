@@ -13,7 +13,7 @@ from app.core.logger import logger
 from app.exceptions.checko import CheckoAPIError
 from app.exceptions.company_exc import CompanyNotFoundError
 from app.models.company import Company
-
+from app.repositories.company_repository import CompanyRepository
 
 
 def growth_calc(current: int | None, previous: int | None) -> float | None:
@@ -93,11 +93,11 @@ async def save_company_if_not_exists(session: AsyncSession, company_data):
 
 async def get_company_by_inn(db: AsyncSession, inn: str) -> Company:
 
-    company = await db.scalar(select(Company).where(Company.inn == inn))
+    repo = CompanyRepository(db)
+    company = await repo.get_by_inn(inn)
     if not company:
         logger.warning("Company with INN %s not found", inn)
         raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")
-
     return company
 
 
