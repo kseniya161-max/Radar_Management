@@ -1,6 +1,10 @@
 from sqlalchemy import select, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.logger import logger
+from app.exceptions.ai import AiAPIError
 from app.models.company import Company
+from app.services.ai_service import score_company
 
 
 class CompanyRepository:
@@ -64,3 +68,8 @@ class CompanyRepository:
             "page": page,
             "items": companies,
         }
+    async def get_all_companies(self) -> list[Company]:
+
+        result = await self.session.execute(select(Company))
+        return result.scalars().all()
+

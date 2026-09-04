@@ -9,6 +9,7 @@ from app.clients.ai_client import ask_ai
 from app.core.logger import logger
 from app.exceptions.ai import AiAPIError
 from app.models.company import Company
+from app.repositories.company_repository import CompanyRepository
 from app.services.company_service import growth_calc
 
 
@@ -61,11 +62,10 @@ async def score_company(company: Company) -> dict:
 
 
 async def score_all_companies(db: AsyncSession):
-    result = await db.execute(select(Company))
-    companies = result.scalars().all()
+    repo = CompanyRepository(db)
+    companies = await repo.get_all_companies()
 
     results = []
-
     for company in companies:
         try:
             result = await score_company(company)
@@ -84,12 +84,9 @@ async def score_all_companies(db: AsyncSession):
             results.append(result)
 
         except AiAPIError as e:
-            logger.error(
-                "Error scoring company %s: %s",
-                company.inn,
-                e,
-            )
+            logger.error("Error scoring company %s: %s", company.inn, e)
             continue
+
     await db.commit()
 
     return {
@@ -97,3 +94,4 @@ async def score_all_companies(db: AsyncSession):
         "processed": len(results),
         "results": results,
     }
+
