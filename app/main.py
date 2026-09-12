@@ -11,10 +11,10 @@ from app.exceptions.handlers import (
     ai_exception_handler,
 )
 
-print("LOADED MAIN 99")
+print("LOADED MAIN 1")
 app = FastAPI(
-    title="KSENIA TEST 99",
-    description="KSENIA TEST 79",
+    title="KSENIA TEST 0",
+    description="KSENIA TEST 0",
     version="0.1.0",
 )
 app.include_router(router_ai)
