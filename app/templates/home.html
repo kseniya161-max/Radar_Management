@@ -1,10 +1,186 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}
+Radar Management — Сбор компаний
+{% endblock %}
+
+
+{% block content %}
+
+<section class="hero">
+
+    <h1>Сбор и обогащение компаний</h1>
+
+    <p class="hero-description">
+        Найдите компании по ОКВЭД и региону
+    </p>
+
+</section>
+
+
+<section class="sync-card">
+
+    <form id="sync-form">
+
+        <div class="form-group">
+
+            <label for="okved">
+                ОКВЭД
+            </label>
+
+            <input
+                type="text"
+                id="okved"
+                name="okved"
+                placeholder="Например: 46.72"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="region">
+                Регион (не обязательно)
+            </label>
+
+            <input
+                type="text"
+                id="region"
+                name="region"
+                placeholder="Например: Республика Дагестан"
+            >
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="primary-button"
+            id="sync-button"
+        >
+            Собрать и обогатить компании
+        </button>
+
+    </form>
+
+
+    <div
+        id="result"
+        class="result"
+        hidden
+    ></div>
+
+</section>
+
+
+<section class="companies-preview">
+
+    <div class="companies-preview-content">
+
+        <div>
+            <h2>Мои компании</h2>
+
+            <p>
+                Просмотр, AI-оценка и ранжирование
+                собранных компаний
+            </p>
+        </div>
+
+        <a
+            href="#"
+            class="secondary-button"
+        >
+            Перейти к компаниям
+        </a>
+
+    </div>
+
+</section>
+
+
+<script>
+
+const form = document.getElementById("sync-form");
+const button = document.getElementById("sync-button");
+const result = document.getElementById("result");
+
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const okved = document.getElementById("okved").value.trim();
+    const region = document.getElementById("region").value.trim();
+
+
+    if (!okved) {
+        return;
+    }
+
+
+    button.disabled = true;
+    button.textContent = "Сбор компаний...";
+
+
+    result.hidden = false;
+    result.className = "result loading";
+    result.textContent = "Запрос выполняется...";
+
+
+    try {
+
+        const params = new URLSearchParams();
+
+        params.append("page", "1");
+
+        if (region) {
+            params.append("region", region);
+        }
+
+
+        const response = await fetch(
+            `/companies/sync/${encodeURIComponent(okved)}/?${params.toString()}`,
+            {
+                method: "POST"
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "Ошибка при сборе компаний"
+            );
+        }
+
+
+        result.className = "result success";
+
+        result.textContent =
+            "Компании успешно собраны и обогащены.";
+
+
+    } catch (error) {
+
+        result.className = "result error";
+
+        result.textContent =
+            error.message;
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent =
+            "Собрать и обогатить компании";
+
+    }
+
+});
+
+</script>
+
+{% endblock %}
