@@ -1,0 +1,38 @@
+from fastapi import APIRouter, Request
+from fastapi.templating import Jinja2Templates
+
+from app.database.db import SessionLocal
+from app.repositories.company_repository import CompanyRepository
+
+
+router_web = APIRouter(
+    prefix="/web",
+    tags=["Web"],
+)
+
+templates = Jinja2Templates(directory="app/templates")
+
+
+@router_web.get("/companies", include_in_schema=False)
+async def companies_page(
+    request: Request,
+    page: int = 1,
+):
+    async with SessionLocal() as session:
+        repo = CompanyRepository(session)
+
+        data = await repo.get_all_paginated(
+            limit=20,
+            page=page,
+        )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="companies.html",
+        context={
+            "companies": data["items"],
+            "total": data["total"],
+            "page": data["page"],
+            "limit": data["limit"],
+        },
+    )
