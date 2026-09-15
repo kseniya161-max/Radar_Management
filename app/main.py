@@ -13,6 +13,7 @@ from app.exceptions.handlers import (
     checko_exception_handler,
     ai_exception_handler,
 )
+from app.web.routes import router_web
 
 print("LOADED MAIN 1")
 app = FastAPI(
@@ -48,3 +49,4 @@ app.include_router(router_tasks)
 app.add_exception_handler(CompanyNotFoundError, company_exception_handler)
 app.add_exception_handler(CheckoAPIError, checko_exception_handler)
 app.add_exception_handler(AiAPIError, ai_exception_handler)
+app.include_router(router_web)

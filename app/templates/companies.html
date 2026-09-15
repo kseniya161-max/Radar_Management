@@ -1,10 +1,165 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}
+Radar Management — Мои компании
+{% endblock %}
+
+{% block content %}
+
+<section class="companies-page">
+
+    <div class="page-header">
+        <div>
+            <h1>Мои компании</h1>
+            <p>
+                Всего компаний: {{ total }}
+            </p>
+        </div>
+
+        <div class="page-actions">
+            <button class="secondary-button">
+                AI Score
+            </button>
+
+            <button class="primary-button">
+                Ранжировать
+            </button>
+        </div>
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="companies-table">
+
+            <thead>
+                <tr>
+                    <th>Компания</th>
+                    <th>ИНН</th>
+
+                    <th>Выручка 2023</th>
+                    <th>Выручка 2024</th>
+                    <th>Выручка 2025</th>
+
+                    <th>Прибыль 2023</th>
+                    <th>Прибыль 2024</th>
+                    <th>Прибыль 2025</th>
+
+                    <th>Телефон</th>
+                    <th>Email</th>
+
+                    <th>AI Priority</th>
+                    <th>AI Risk</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for company in companies %}
+
+                <tr>
+
+                    <td>
+                        {{ company.name }}
+                    </td>
+
+                    <td>
+                        {{ company.inn }}
+                    </td>
+
+
+                    <td>
+                        {{ company.revenue_2023 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.revenue_2024 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.revenue_2025 or "—" }}
+                    </td>
+
+
+                    <td>
+                        {{ company.profit_2023 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.profit_2024 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.profit_2025 or "—" }}
+                    </td>
+
+
+                    <td>
+                        {{ company.phone or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.email or "—" }}
+                    </td>
+
+
+                    <td>
+                        {{ company.ai_priority or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.ai_risk or "—" }}
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="12" class="empty-state">
+                        Компании пока не собраны
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% if total > limit %}
+
+    <div class="pagination">
+
+        {% if page > 1 %}
+            <a
+                href="/companies?page={{ page - 1 }}"
+                class="secondary-button"
+            >
+                ← Назад
+            </a>
+        {% endif %}
+
+        <span>
+            Страница {{ page }}
+        </span>
+
+        {% if page * limit < total %}
+            <a
+                href="/companies?page={{ page + 1 }}"
+                class="secondary-button"
+            >
+                Далее →
+            </a>
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
