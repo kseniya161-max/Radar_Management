@@ -36,3 +36,11 @@ async def companies_page(
             "limit": data["limit"],
         },
     )
+
+
+@router_web.get("/", include_in_schema=False)
+async def home(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="home.html",
+    )

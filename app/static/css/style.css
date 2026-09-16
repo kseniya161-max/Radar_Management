@@ -323,3 +323,147 @@ body {
     }
 
 }
+
+
+/* COMPANIES PAGE */
+
+.companies-page {
+    width: 100%;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    margin: 0 0 10px;
+    font-size: 32px;
+}
+
+.page-header p {
+    margin: 0;
+    color: #697386;
+}
+
+.page-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-actions .primary-button {
+    width: auto;
+    margin-top: 0;
+}
+
+.page-actions .secondary-button {
+    white-space: nowrap;
+}
+
+
+/* TABLE */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+
+    background: #ffffff;
+    border: 1px solid #e4e8ef;
+    border-radius: 12px;
+}
+
+.companies-table {
+    width: 100%;
+    min-width: 1350px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.companies-table th,
+.companies-table td {
+    padding: 14px 12px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.companies-table th {
+    background: #f8f9fb;
+    font-size: 13px;
+    font-weight: 700;
+    color: #172033;
+    white-space: nowrap;
+}
+
+.companies-table td {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.companies-table tbody tr:hover {
+    background: #fafbfc;
+}
+
+
+/* COLUMN WIDTHS */
+
+.companies-table th:nth-child(1),
+.companies-table td:nth-child(1) {
+    width: 220px;
+}
+
+.companies-table th:nth-child(2),
+.companies-table td:nth-child(2) {
+    width: 115px;
+}
+
+.companies-table th:nth-child(3),
+.companies-table td:nth-child(3),
+.companies-table th:nth-child(4),
+.companies-table td:nth-child(4),
+.companies-table th:nth-child(5),
+.companies-table td:nth-child(5),
+.companies-table th:nth-child(6),
+.companies-table td:nth-child(6),
+.companies-table th:nth-child(7),
+.companies-table td:nth-child(7),
+.companies-table th:nth-child(8),
+.companies-table td:nth-child(8) {
+    width: 105px;
+}
+
+.companies-table th:nth-child(9),
+.companies-table td:nth-child(9) {
+    width: 180px;
+}
+
+.companies-table th:nth-child(10),
+.companies-table td:nth-child(10) {
+    width: 220px;
+}
+
+.companies-table th:nth-child(11),
+.companies-table td:nth-child(11),
+.companies-table th:nth-child(12),
+.companies-table td:nth-child(12) {
+    width: 100px;
+}
+
+
+/* PAGINATION */
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.pagination .secondary-button {
+    width: auto;
+}
