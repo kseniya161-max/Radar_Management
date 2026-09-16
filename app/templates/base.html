@@ -21,24 +21,46 @@
 <header class="header">
     <div class="header-content">
 
-        <div class="logo">
-            RADAR MANAGEMENT
+        <div class="header-left">
+            <button
+                type="button"
+                class="back-button"
+                onclick="goBack()"
+                title="Назад"
+            >
+                ←
+            </button>
+
+            <div class="logo">
+                RADAR MANAGEMENT
+            </div>
         </div>
 
         <nav class="navigation">
-    <a href="/web/"
-       class="nav-link {% if request.url.path == '/web/' %}active{% endif %}">
-        Главная
-    </a>
+            <a href="/web/"
+               class="nav-link {% if request.url.path in ['/web', '/web/'] %}active{% endif %}">
+                Главная
+            </a>
 
-    <a href="/web/companies/"
-       class="nav-link {% if request.url.path.startswith('/web/companies') %}active{% endif %}">
-        Мои компании
-    </a>
-</nav>
+            <a href="/web/companies/"
+               class="nav-link {% if request.url.path.startswith('/web/companies') %}active{% endif %}">
+                Мои компании
+            </a>
+        </nav>
 
     </div>
 </header>
+
+
+<script>
+function goBack() {
+    if (window.history.length > 1 && document.referrer !== "") {
+        window.history.back();
+    } else {
+        window.location.href = "/web/";
+    }
+}
+</script>
 
 
 <main class="main-content">
