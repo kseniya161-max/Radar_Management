@@ -21,7 +21,7 @@ Radar Management — Мои компании
                 AI Score
             </button>
 
-            <button class="primary-button">
+            <button class="secondary-button">
                 Ранжировать
             </button>
         </div>
@@ -37,19 +37,17 @@ Radar Management — Мои компании
                     <th>Компания</th>
                     <th>ИНН</th>
 
-                    <th>Выручка 2023</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Регион</th>
+
+                    <th>Дата регистрации</th>
                     <th>Выручка 2024</th>
                     <th>Выручка 2025</th>
 
-                    <th>Прибыль 2023</th>
-                    <th>Прибыль 2024</th>
-                    <th>Прибыль 2025</th>
+                    <th>Рост выручки</th>
+                    <th>Рост прибыли</th>
 
-                    <th>Телефон</th>
-                    <th>Email</th>
-
-                    <th>AI Priority</th>
-                    <th>AI Risk</th>
                 </tr>
             </thead>
 
@@ -69,7 +67,19 @@ Radar Management — Мои компании
 
 
                     <td>
-                        {{ company.revenue_2023 or "—" }}
+                        {{ company.phone or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.email or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.region or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.registration_date or "—" }}
                     </td>
 
                     <td>
@@ -80,35 +90,12 @@ Radar Management — Мои компании
                         {{ company.revenue_2025 or "—" }}
                     </td>
 
-
                     <td>
-                        {{ company.profit_2023 or "—" }}
+                        {{ company.revenue_growth_3 or "—" }}
                     </td>
 
                     <td>
-                        {{ company.profit_2024 or "—" }}
-                    </td>
-
-                    <td>
-                        {{ company.profit_2025 or "—" }}
-                    </td>
-
-
-                    <td>
-                        {{ company.phone or "—" }}
-                    </td>
-
-                    <td>
-                        {{ company.email or "—" }}
-                    </td>
-
-
-                    <td>
-                        {{ company.ai_priority or "—" }}
-                    </td>
-
-                    <td>
-                        {{ company.ai_risk or "—" }}
+                        {{ company.profit_growth_3 or "—" }}
                     </td>
 
                 </tr>
@@ -116,7 +103,7 @@ Radar Management — Мои компании
                 {% else %}
 
                 <tr>
-                    <td colspan="12" class="empty-state">
+                    <td colspan="10" class="empty-state">
                         Компании пока не собраны
                     </td>
                 </tr>

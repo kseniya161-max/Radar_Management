@@ -396,12 +396,14 @@ body {
     font-size: 13px;
     font-weight: 700;
     color: #172033;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 .companies-table td {
     font-size: 14px;
     line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .companies-table tbody tr:hover {
@@ -410,49 +412,70 @@ body {
 
 
 /* COLUMN WIDTHS */
+/* Общая минимальная ширина таблицы должна быть увеличена */
+.companies-table {
+    min-width: 1450px;
+}
 
+/* 1. Компания */
 .companies-table th:nth-child(1),
 .companies-table td:nth-child(1) {
     width: 220px;
 }
 
+/* 2. ИНН */
 .companies-table th:nth-child(2),
 .companies-table td:nth-child(2) {
     width: 115px;
 }
 
+/* 3. Телефон (увеличено со 105px) */
 .companies-table th:nth-child(3),
-.companies-table td:nth-child(3),
+.companies-table td:nth-child(3) {
+    width: 150px;
+}
+
+/* 4. Email (увеличено со 105px) */
 .companies-table th:nth-child(4),
-.companies-table td:nth-child(4),
+.companies-table td:nth-child(4) {
+    width: 200px;
+}
+
+/* 5. Регион (увеличено со 105px) */
 .companies-table th:nth-child(5),
-.companies-table td:nth-child(5),
+.companies-table td:nth-child(5) {
+    width: 160px;
+}
+
+/* 6. Дата регистрации (увеличено со 105px) */
 .companies-table th:nth-child(6),
-.companies-table td:nth-child(6),
+.companies-table td:nth-child(6) {
+    width: 120px;
+}
+
+/* 7. Выручка 2024 */
 .companies-table th:nth-child(7),
-.companies-table td:nth-child(7),
+.companies-table td:nth-child(7) {
+    width: 110px;
+}
+
+/* 8. Выручка 2025 */
 .companies-table th:nth-child(8),
 .companies-table td:nth-child(8) {
-    width: 105px;
+    width: 110px;
 }
 
+/* 9. Рост выручки */
 .companies-table th:nth-child(9),
 .companies-table td:nth-child(9) {
-    width: 180px;
+    width: 120px;
 }
 
+/* 10. Рост прибыли */
 .companies-table th:nth-child(10),
 .companies-table td:nth-child(10) {
-    width: 220px;
+    width: 120px;
 }
-
-.companies-table th:nth-child(11),
-.companies-table td:nth-child(11),
-.companies-table th:nth-child(12),
-.companies-table td:nth-child(12) {
-    width: 100px;
-}
-
 
 /* PAGINATION */
 
