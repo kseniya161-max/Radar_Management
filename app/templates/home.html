@@ -88,12 +88,13 @@ Radar Management — Сбор компаний
             </p>
         </div>
 
-        <a
-            href="#"
-            class="secondary-button"
-        >
-            Перейти к компаниям
-        </a>
+        <button
+    type="button"
+    class="secondary-button"
+    id="go-companies"
+>
+    Перейти к компаниям
+</button>
 
     </div>
 
@@ -181,6 +182,11 @@ form.addEventListener("submit", async function(event) {
 
 });
 
+</script>
+<script>
+document.getElementById("go-companies").addEventListener("click", function () {
+    window.location.href = "/web/companies";
+});
 </script>
 
 {% endblock %}
