@@ -411,25 +411,25 @@ button.secondary-button:hover {
     width: 115px;
 }
 
-/* 3. Телефон (увеличено со 105px) */
+/* 3. Телефон */
 .companies-table th:nth-child(3),
 .companies-table td:nth-child(3) {
     width: 150px;
 }
 
-/* 4. Email (увеличено со 105px) */
+/* 4. Email /
 .companies-table th:nth-child(4),
 .companies-table td:nth-child(4) {
     width: 200px;
 }
 
-/* 5. Регион (увеличено со 105px) */
+/* 5. Регион */
 .companies-table th:nth-child(5),
 .companies-table td:nth-child(5) {
     width: 160px;
 }
 
-/* 6. Дата регистрации (увеличено со 105px) */
+/* 6. Дата регистрации */
 .companies-table th:nth-child(6),
 .companies-table td:nth-child(6) {
     width: 120px;
@@ -471,4 +471,38 @@ button.secondary-button:hover {
 
 .pagination .secondary-button {
     width: auto;
+}
+
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.back-button {
+    flex-shrink: 0;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #cfd5df;
+    border-radius: 50%;
+
+    background: #ffffff;
+    color: #172033;
+
+    font-size: 18px;
+    line-height: 1;
+
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.back-button:hover {
+    background: #f5f7fa;
 }
