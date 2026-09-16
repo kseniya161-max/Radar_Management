@@ -17,13 +17,8 @@ Radar Management — Мои компании
         </div>
 
         <div class="page-actions">
-            <button class="secondary-button">
-                AI Score
-            </button>
-
-            <button class="secondary-button">
-                Ранжировать
-            </button>
+            <button class="secondary-button" id="btn-ai-score">AI Score</button>
+            <button class="secondary-button" id="btn-rank">Ранжировать</button>
         </div>
     </div>
 
@@ -47,6 +42,9 @@ Radar Management — Мои компании
 
                     <th>Рост выручки</th>
                     <th>Рост прибыли</th>
+
+                    <th>AI Priority</th>
+                    <th>AI Risk</th>
 
                 </tr>
             </thead>
@@ -98,12 +96,20 @@ Radar Management — Мои компании
                         {{ company.profit_growth_3 or "—" }}
                     </td>
 
+                    <td>
+                        {{ company.ai_priority or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.ai_risk or "—" }}
+                    </td>
+
                 </tr>
 
                 {% else %}
 
                 <tr>
-                    <td colspan="10" class="empty-state">
+                    <td colspan="12" class="empty-state">
                         Компании пока не собраны
                     </td>
                 </tr>
@@ -123,7 +129,7 @@ Radar Management — Мои компании
 
         {% if page > 1 %}
             <a
-                href="/companies?page={{ page - 1 }}"
+                href="/web/companies?page={{ page - 1 }}"
                 class="secondary-button"
             >
                 ← Назад
@@ -136,7 +142,7 @@ Radar Management — Мои компании
 
         {% if page * limit < total %}
             <a
-                href="/companies?page={{ page + 1 }}"
+                href="/web/companies?page={{ page + 1 }}"
                 class="secondary-button"
             >
                 Далее →
@@ -148,5 +154,64 @@ Radar Management — Мои компании
     {% endif %}
 
 </section>
+<script>
+document.getElementById("btn-ai-score").addEventListener("click", async () => {
+
+    const button = document.getElementById("btn-ai-score");
+
+    button.disabled = true;
+    button.textContent = "AI анализирует...";
+
+    try {
+        const response = await fetch("/companies/ai_score_all", {
+            method: "POST"
+        });
+
+        if (!response.ok) {
+            throw new Error("Не удалось запустить AI scoring");
+        }
+
+        const data = await response.json();
+        const taskId = data.task_id;
+
+        const checkStatus = async () => {
+
+            const statusResponse = await fetch(`/tasks/${taskId}`);
+
+            if (!statusResponse.ok) {
+                throw new Error("Не удалось получить статус задачи");
+            }
+
+            const statusData = await statusResponse.json();
+
+            if (statusData.status === "SUCCESS") {
+                location.reload();
+                return;
+            }
+
+            if (
+                statusData.status === "FAILURE" ||
+                statusData.status === "REVOKED"
+            ) {
+                throw new Error("AI scoring завершился с ошибкой");
+            }
+
+            setTimeout(checkStatus, 1000);
+        };
+
+        checkStatus();
+
+    } catch (error) {
+
+        alert(error.message);
+
+        button.disabled = false;
+        button.textContent = "AI Score";
+    }
+});
+</script>
+
+
+
 
 {% endblock %}

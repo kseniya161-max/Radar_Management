@@ -15,10 +15,10 @@ from app.exceptions.handlers import (
 )
 from app.web.routes import router_web
 
-print("LOADED MAIN 1")
+print("LOADED MAIN !")
 app = FastAPI(
-    title="KSENIA TEST 0",
-    description="KSENIA TEST 0",
+    title="KSENIA TEST !",
+    description="KSENIA TEST !",
     version="0.1.0",
 )
 
