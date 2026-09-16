@@ -26,14 +26,16 @@
         </div>
 
         <nav class="navigation">
-            <a href="/" class="nav-link active">
-                Главная
-            </a>
+    <a href="/"
+       class="nav-link {% if request.url.path == '/' %}active{% endif %}">
+        Главная
+    </a>
 
-            <a href="#" class="nav-link">
-                Мои компании
-            </a>
-        </nav>
+    <a href="/web/companies/"
+       class="nav-link {% if request.url.path.startswith('/web/companies') %}active{% endif %}">
+        Мои компании
+    </a>
+</nav>
 
     </div>
 </header>
