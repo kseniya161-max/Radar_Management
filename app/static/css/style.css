@@ -330,7 +330,8 @@ body {
     margin-top: 0;
 }
 
-button.secondary-button {
+.secondary-button {
+    display: inline-block;
     background: #ffffff;
     font-family: inherit;
     font-size: 14px;
@@ -340,9 +341,10 @@ button.secondary-button {
     border-radius: 8px;
     padding: 11px 18px;
     cursor: pointer;
+    text-decoration: none;
 }
 
-button.secondary-button:hover {
+.secondary-button:hover {
     background: #f5f7fa;
 }
 
@@ -360,7 +362,7 @@ button.secondary-button:hover {
 
 .companies-table {
     width: 100%;
-    min-width: 1350px;
+    min-width: 1450px;
     border-collapse: collapse;
     table-layout: fixed;
 }
@@ -392,12 +394,7 @@ button.secondary-button:hover {
     background: #fafbfc;
 }
 
-
 /* COLUMN WIDTHS */
-/* Общая минимальная ширина таблицы должна быть увеличена */
-.companies-table {
-    min-width: 1450px;
-}
 
 /* 1. Компания */
 .companies-table th:nth-child(1),
@@ -417,7 +414,7 @@ button.secondary-button:hover {
     width: 150px;
 }
 
-/* 4. Email /
+/* 4. Email */
 .companies-table th:nth-child(4),
 .companies-table td:nth-child(4) {
     width: 200px;
@@ -457,6 +454,18 @@ button.secondary-button:hover {
 .companies-table th:nth-child(10),
 .companies-table td:nth-child(10) {
     width: 120px;
+}
+
+/* 11. AI Priority */
+.companies-table th:nth-child(11),
+.companies-table td:nth-child(11) {
+    width: 110px;
+}
+
+/* 12. AI Risk */
+.companies-table th:nth-child(12),
+.companies-table td:nth-child(12) {
+    width: 100px;
 }
 
 /* PAGINATION */

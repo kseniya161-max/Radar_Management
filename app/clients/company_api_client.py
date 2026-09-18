@@ -39,7 +39,7 @@ async def search_companies_by_okved(
         "by": "okved",
         "obj": "org",
         "query": okved_code,
-        "limit": 5,
+        "limit": 25,
         "page": page,
         "active": "true",
     }
