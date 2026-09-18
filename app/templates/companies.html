@@ -97,11 +97,11 @@ Radar Management — Мои компании
                     </td>
 
                     <td>
-                        {{ company.ai_priority or "—" }}
+                        {{ company.ai_priority if company.ai_priority is not none else "—" }}
                     </td>
 
                     <td>
-                        {{ company.ai_risk or "—" }}
+                        {{ company.ai_risk if company.ai_risk is not none else "—" }}
                     </td>
 
                 </tr>
