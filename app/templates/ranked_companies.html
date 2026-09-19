@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}
+Radar Management — AI Рейтинг
+{% endblock %}
+
+{% block content %}
+
+<section class="companies-page ranked-page">
+
+    <div class="page-header">
+
+        <div>
+            <h1>AI Рейтинг компаний</h1>
+
+            <p>
+                Всего компаний: {{ total }}
+            </p>
+        </div>
+
+        <div class="page-actions">
+
+            <a
+                href="/web/companies"
+                class="ranked-secondary-button"
+            >
+                ← Все компании
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-wrapper ranked-table-wrapper">
+
+        <table class="companies-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Компания</th>
+                    <th>ИНН</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Регион</th>
+                    <th>Дата регистрации</th>
+                    <th>Выручка 2024</th>
+                    <th>Выручка 2025</th>
+                    <th>Рост выручки</th>
+                    <th>Рост прибыли</th>
+                    <th>AI Priority</th>
+                    <th>AI Risk</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for company in companies %}
+
+                <tr>
+
+                    <td>
+                        {{ company.name }}
+                    </td>
+
+                    <td>
+                        {{ company.inn }}
+                    </td>
+
+                    <td>
+                        {{ company.phone or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.email or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.region or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.registration_date or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.revenue_2024 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.revenue_2025 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.revenue_growth_3 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.profit_growth_3 or "—" }}
+                    </td>
+
+                    <td class="ai-priority-cell">
+                        {{ company.ai_priority or "—" }}
+                    </td>
+
+                    <td class="ai-risk-cell">
+                        {{ company.ai_risk or "—" }}
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="12" class="empty-state">
+                        Компании пока не оценены AI
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% if total > limit %}
+
+    <div class="pagination ranked-pagination">
+
+        {% if page > 1 %}
+
+        <a
+            href="/web/companies/ranked?page={{ page - 1 }}"
+            class="ranked-secondary-button"
+        >
+            ← Назад
+        </a>
+
+        {% endif %}
+
+
+        <span>
+            Страница {{ page }}
+        </span>
+
+
+        {% if page * limit < total %}
+
+        <a
+            href="/web/companies/ranked?page={{ page + 1 }}"
+            class="ranked-secondary-button"
+        >
+            Далее →
+        </a>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
