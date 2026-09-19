@@ -4,7 +4,6 @@ from fastapi.templating import Jinja2Templates
 from app.database.db import SessionLocal
 from app.repositories.company_repository import CompanyRepository
 
-
 router_web = APIRouter(
     prefix="/web",
     tags=["Web"],
@@ -43,4 +42,26 @@ async def home(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="home.html",
+    )
+
+
+@router_web.get("/ranked", include_in_schema=False)
+async def rank(request: Request, page: int = 1):
+    async with SessionLocal() as session:
+        repo = CompanyRepository(session)
+
+        data = await repo.get_all_ranked_paginated(
+            limit=20,
+            page=page,
+        )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="ranked_companies.html",
+        context={
+            "companies": data["items"],
+            "total": data["total"],
+            "page": data["page"],
+            "limit": data["limit"],
+        },
     )

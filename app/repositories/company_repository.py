@@ -65,6 +65,28 @@ class CompanyRepository:
             "items": companies,
         }
 
+    async def get_all_ranked_paginated(self, limit: int = 20, page: int = 1):
+        offset = (page - 1) * limit
+        result = await self.session.execute(
+            select(Company)
+            .order_by(Company.ai_priority.desc().nulls_last())
+            .offset(offset)
+            .limit(limit)
+        )
+        companies = result.scalars().all()
+        total_result = await self.session.execute(
+            select(func.count()).select_from(Company)
+        )
+
+        total = total_result.scalar_one()
+
+        return {
+            "items": companies,
+            "total": total,
+            "page": page,
+            "limit": limit,
+        }
+
     async def get_all_companies(self) -> list[Company]:
 
         result = await self.session.execute(select(Company))

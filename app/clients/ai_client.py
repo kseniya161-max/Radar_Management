@@ -17,7 +17,7 @@ def ask_ai(prompt: str):
     try:
         response = client.chat.completions.create(
             # model="google/gemma-4-31b-it:free",
-            model = 'openrouter/free',
+            model="openrouter/free",
             messages=[
                 {
                     "role": "system",

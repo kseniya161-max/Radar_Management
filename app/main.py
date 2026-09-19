@@ -17,12 +17,10 @@ from app.web.routes import router_web
 
 print("LOADED MAIN !")
 app = FastAPI(
-    title="KSENIA TEST !",
+    title="!!!",
     description="KSENIA TEST !",
     version="0.1.0",
 )
-
-
 
 
 app.mount(
@@ -30,8 +28,6 @@ app.mount(
     StaticFiles(directory="app/static"),
     name="static",
 )
-
-
 
 
 app.include_router(router_ai)
