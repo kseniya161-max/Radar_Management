@@ -515,3 +515,59 @@ body {
 .back-button:hover {
     background: #f5f7fa;
 }
+
+
+/* AI RANKING */
+
+.ranked-page .page-header h1 {
+    color: #7a2638;
+}
+
+.ranked-secondary-button {
+    display: inline-block;
+    text-decoration: none;
+
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #7a2638;
+
+    border: 1px solid #c9a3ac;
+    border-radius: 8px;
+
+    padding: 11px 18px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.ranked-secondary-button:hover {
+    background: #faf1f3;
+    border-color: #7a2638;
+}
+
+.ranked-table-wrapper {
+    border-color: #d9b9c1;
+}
+
+.ranked-page .companies-table th {
+    background: #faf1f3;
+}
+
+.ranked-page .ai-priority-cell {
+    font-weight: 700;
+    color: #7a2638;
+}
+
+.ranked-page .ai-risk-cell {
+    font-weight: 600;
+}
+
+.ranked-pagination {
+    margin-top: 25px;
+}

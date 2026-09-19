@@ -46,7 +46,7 @@ async def home(request: Request):
     )
 
 
-@router_web.get('/companies/ranked', include_in_schema=False)
+@router_web.get('/ranked', include_in_schema=False)
 async def rank(request:Request, page: int = 1):
     async with SessionLocal() as session:
         repo = CompanyRepository(session)
@@ -58,7 +58,7 @@ async def rank(request:Request, page: int = 1):
 
         return templates.TemplateResponse(
             request=request,
-            name="companies.html",
+            name="ranked_companies.html",
             context={
                 "companies": data["items"],
                 "total": data["total"],
