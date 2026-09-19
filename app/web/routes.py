@@ -51,18 +51,19 @@ async def rank(request:Request, page: int = 1):
     async with SessionLocal() as session:
         repo = CompanyRepository(session)
 
-        data = await repo.get_all_paginated(
+        data = await repo.get_all_ranked_paginated(
             limit=20,
             page=page,
         )
 
-        return templates.TemplateResponse(
-            request=request,
-            name="ranked_companies.html",
-            context={
-                "companies": data["items"],
-                "total": data["total"],
-                "page": data["page"],
-                "limit": data["limit"],
-            },
-        )
+    return templates.TemplateResponse(
+        request=request,
+        name="ranked_companies.html",
+        context={
+            "companies": data["items"],
+            "total": data["total"],
+            "page": data["page"],
+            "limit": data["limit"],
+        },
+    )
+
