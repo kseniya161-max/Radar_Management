@@ -1,6 +1,8 @@
 from sqlalchemy import select, func, case
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, session
 from app.models.company import Company
+
+
 
 
 class CompanyRepository:
@@ -63,6 +65,22 @@ class CompanyRepository:
             "limit": limit,
             "page": page,
             "items": companies,
+        }
+    async def get_all_ranked_paginated(self, limit: int = 20, page: int = 1):
+        offset = (page -1) * limit
+        result = await session.execute(select(Company).order_by(Company.ai_priority.desc()).nullslast().offset(offset).limit(limit))
+        companies = result.scalars().all()
+        total_result = await self.session.execute(
+            select(func.count()).select_from(Company)
+        )
+
+        total = total_result.scalar_one()
+
+        return {
+            "items": companies,
+            "total": total,
+            "page": page,
+            "limit": limit,
         }
 
     async def get_all_companies(self) -> list[Company]:
