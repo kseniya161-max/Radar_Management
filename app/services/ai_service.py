@@ -17,27 +17,65 @@ def build_company_prompt(company: Company) -> str:
     growth_revenue = growth_calc(company.revenue_2025, company.revenue_2024)
     growth_profit = growth_calc(company.profit_2025, company.profit_2024)
 
-    return f"""Вычисли прирост прибыли revenue_2025 и revenue_2024 в 
-    процентном соотношении вычисли прирост выручки profit_2025 и profit_2024 в приоритетном соотношении и 
-    cоздай приритетность. ты  B2B lead scoring system верни только валидный JSON ответ должен быть на русском языке{{
-  "priority": 1-100,
-  "risk": "low|medium|high",
-  "summary": "short explanation"
+    return f"""
+Ты — B2B lead scoring system.
+
+Твоя задача- оценить компанию как потенциального B2B-клиента.
+
+AI Priority - это коммерческий приоритет компании для отдела продаж
+по шкале от 1 до 100.
+
+Чем выше AI Priority, тем выше потенциальная коммерческая привлекательность
+компании и тем выше приоритет для работы с ней.
+
+При определении AI Priority учитывай в первую очередь:
+- рост выручки за 2024 и 2025 год revenue_2025 и revenue_2024;
+- рост прибыли за 2024 и 2025 profit_2025 и profit_2024;
+- абсолютный размер выручки;
+- абсолютный размер прибыли;
+- устойчивость финансовой динамики;
+- доступные контактные данные;
+- другие предоставленные данные о компании.
+
+AI Risk- отдельная характеристика.
+Она показывает уровень риска при работе с компанией.
+
+Используй:
+- low — низкий риск;
+- medium — средний риск;
+- high — высокий риск.
+
+AI Risk НЕ является прямой обратной шкалой AI Priority.
+Компания может иметь одновременно высокий AI Priority и высокий AI Risk,
+если она коммерчески привлекательна, но при этом имеет существенные риски.
+
+Верни только валидный JSON на русском языке:
+
+{{
+    "priority": 1-100,
+    "risk": "low|medium|high",
+    "summary": "краткое объяснение оценки"
 }}
-Company data:
-- Name: {company.name}
-- INN: {company.inn}
-- OKVED: {company.okved}
-- Region: {company.region}
-- Revenue 2025: {company.revenue_2025}
-- Revenue 2024: {company.revenue_2024}
-- Revenue growth %: {growth_revenue}
-- Profit 2025: {company.profit_2025}
-- Profit 2024: {company.profit_2024}
-- Profit growth %: {growth_profit}
+
+Данные компании:
+
+- Название: {company.name}
+- ИНН: {company.inn}
+- ОКВЭД: {company.okved}
+- Регион: {company.region}
+
+- Выручка 2025: {company.revenue_2025}
+- Выручка 2024: {company.revenue_2024}
+- Рост выручки %: {growth_revenue}
+
+- Прибыль 2025: {company.profit_2025}
+- Прибыль 2024: {company.profit_2024}
+- Рост прибыли %: {growth_profit}
+
 - Website: {company.website}
 - Email: {company.email}
-- Phone: {company.phone}"""
+- Phone: {company.phone}
+"""
 
 
 def extract_json(text: str | None) -> dict:
