@@ -2,6 +2,8 @@ from fastapi import APIRouter, Query
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import SessionDep
 from fastapi import APIRouter
+
+from app.repositories.company_repository import CompanyRepository
 from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,
@@ -14,7 +16,7 @@ from app.services.company_service import (
     enrich_company_data,
     sync_and_enrich_companies,
     get_company_by_inn,
-    get_all_companies,
+    get_all_companies, archive_company,
 )
 
 router_companies = APIRouter(prefix="/companies", tags=["Companies"])
@@ -96,7 +98,10 @@ async def sync_company(
 
 
 @router_companies.post("/{inn}/archive")
-async def archive_company(inn:str, session: SessionDep):
+async def archive_company_status(inn:str, session: SessionDep):
+    await archive_company(session, inn)
+    await session.commit()
+    return {"status": "ok"}
 
 
 

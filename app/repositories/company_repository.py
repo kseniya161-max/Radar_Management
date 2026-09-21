@@ -1,5 +1,6 @@
 from sqlalchemy import select, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.company import Company, Progress
 
 
