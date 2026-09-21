@@ -109,3 +109,12 @@ async def archive_company(db,inn:str):
     if not company:
         raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")
     return company
+
+
+async def restore_company(db,inn:str):
+    repo = CompanyRepository(db)
+    company = await repo.restore(inn)
+    if not company:
+        raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")
+    return company
+

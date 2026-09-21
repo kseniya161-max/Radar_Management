@@ -16,7 +16,7 @@ from app.services.company_service import (
     enrich_company_data,
     sync_and_enrich_companies,
     get_company_by_inn,
-    get_all_companies, archive_company,
+    get_all_companies, archive_company, restore_company,
 )
 
 router_companies = APIRouter(prefix="/companies", tags=["Companies"])
@@ -102,6 +102,13 @@ async def archive_company_status(inn:str, session: SessionDep):
     await archive_company(session, inn)
     await session.commit()
     return {"status": "ok"}
+
+
+@router_companies.post("/{inn}/restore")
+async def restore_company_status(inn:str, session: SessionDep):
+    await restore_company(session,inn)
+    await session.commit()
+    return {"status": "restored from archive"}
 
 
 

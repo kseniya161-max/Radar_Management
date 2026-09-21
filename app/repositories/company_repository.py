@@ -107,3 +107,10 @@ class CompanyRepository:
         company.progress = Progress.ARCHIVED
 
         return company
+
+    async def restore(self, inn:str):
+        company = await self.get_by_inn(inn)
+        if company is None:
+            return None
+        company.progress = Progress.ACTIVE
+        return company
