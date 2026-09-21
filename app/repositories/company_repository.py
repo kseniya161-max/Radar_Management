@@ -1,6 +1,6 @@
 from sqlalchemy import select, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.company import Company
+from app.models.company import Company, Progress
 
 
 class CompanyRepository:
@@ -26,7 +26,7 @@ class CompanyRepository:
         limit: int,
         page: int,
     ) -> dict:
-        total_stmt = select(func.count()).select_from(Company)
+        total_stmt = select(func.count()).select_from(Company).where(Company.progress == Progress.ACTIVE)
         total = await self.session.scalar(total_stmt)
 
         offset = (page - 1) * limit
@@ -46,7 +46,7 @@ class CompanyRepository:
         )
 
         stmt = (
-            select(Company)
+            select(Company).where(Company.progress == Progress.ACTIVE)
             .order_by(
                 priority.asc(),
                 Company.revenue_growth_3.desc().nulls_last(),
@@ -68,14 +68,14 @@ class CompanyRepository:
     async def get_all_ranked_paginated(self, limit: int = 20, page: int = 1):
         offset = (page - 1) * limit
         result = await self.session.execute(
-            select(Company)
+            select(Company).where(Company.progress == Progress.ACTIVE)
             .order_by(Company.ai_priority.desc().nulls_last())
             .offset(offset)
             .limit(limit)
         )
         companies = result.scalars().all()
         total_result = await self.session.execute(
-            select(func.count()).select_from(Company)
+            select(func.count()).select_from(Company).where(Company.progress == Progress.ACTIVE)
         )
 
         total = total_result.scalar_one()
@@ -94,5 +94,5 @@ class CompanyRepository:
 
 
     async def has_ai_ranked(self) -> bool:
-        result = await self.session.execute(select(Company.id).where(Company.ai_priority.is_not(None)).limit(1))
+        result = await self.session.execute(select(Company.id).where(Company.progress == Progress.ACTIVE,Company.ai_priority.is_not(None)).limit(1))
         return result.scalar_one_or_none() is not None
