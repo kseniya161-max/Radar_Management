@@ -4,14 +4,11 @@ from app.database.base import Base
 from enum import Enum
 
 
-
-
-class Progress(str,Enum):
+class Progress(str, Enum):
     ACTIVE = "active"
     ARCHIVED = "archived"
     REJECTED = "rejected"
     TRANSFERRED = "transferred"
-
 
 
 class Company(Base):
@@ -43,4 +40,13 @@ class Company(Base):
     profit_growth_3: Mapped[float | None] = mapped_column(nullable=True)
     ai_priority: Mapped[int | None] = mapped_column(nullable=True, index=True)
     ai_risk: Mapped[str | None] = mapped_column(String(20), nullable=True, index=True)
-    progress: Mapped[Progress] = mapped_column(SAEnum(Progress,name="company_progress",values_callable=lambda enum: [e.value for e in enum],),default=Progress.ACTIVE,server_default="active",index=True,)
+    progress: Mapped[Progress] = mapped_column(
+        SAEnum(
+            Progress,
+            name="company_progress",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
+        default=Progress.ACTIVE,
+        server_default="active",
+        index=True,
+    )

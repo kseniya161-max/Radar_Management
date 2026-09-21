@@ -589,8 +589,11 @@ body {
 
     padding: 4px;
 
-    font-size: 18px;
-    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #697386;
 
     cursor: pointer;
 
@@ -598,14 +601,20 @@ body {
 
     transition:
         background 0.15s,
+        color 0.15s,
         transform 0.15s;
 }
 
 .archive-button:hover {
     background: #f0f2f6;
+    color: #a52a2a;
     transform: scale(1.1);
 }
 
 .archive-button:active {
     transform: scale(0.95);
+}
+
+.archive-button svg {
+    display: block;
 }
