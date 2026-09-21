@@ -93,3 +93,10 @@ async def sync_company(
         "status": "ok",
         "message": f"Компании по ОКВЭД {okved_code} загружены и обогащены",
     }
+
+
+@router_companies.post("/{inn}/archive")
+async def archive_company(inn:str, session: SessionDep):
+
+
+

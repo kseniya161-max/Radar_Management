@@ -96,3 +96,13 @@ class CompanyRepository:
     async def has_ai_ranked(self) -> bool:
         result = await self.session.execute(select(Company.id).where(Company.progress == Progress.ACTIVE,Company.ai_priority.is_not(None)).limit(1))
         return result.scalar_one_or_none() is not None
+
+
+    async def change_status(self,inn: str):
+        company = await self.get_by_inn(inn)
+        if company is None:
+            return None
+
+        company.progress = Progress.ARCHIVED
+
+        return company
