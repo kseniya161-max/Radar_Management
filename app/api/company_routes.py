@@ -2,6 +2,8 @@ from fastapi import APIRouter, Query
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import SessionDep
 from fastapi import APIRouter
+
+from app.repositories.company_repository import CompanyRepository
 from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,
@@ -15,6 +17,8 @@ from app.services.company_service import (
     sync_and_enrich_companies,
     get_company_by_inn,
     get_all_companies,
+    archive_company,
+    restore_company,
 )
 
 router_companies = APIRouter(prefix="/companies", tags=["Companies"])
@@ -93,3 +97,17 @@ async def sync_company(
         "status": "ok",
         "message": f"Компании по ОКВЭД {okved_code} загружены и обогащены",
     }
+
+
+@router_companies.post("/{inn}/archive")
+async def archive_company_status(inn: str, session: SessionDep):
+    await archive_company(session, inn)
+    await session.commit()
+    return {"status": "ok"}
+
+
+@router_companies.post("/{inn}/restore")
+async def restore_company_status(inn: str, session: SessionDep):
+    await restore_company(session, inn)
+    await session.commit()
+    return {"status": "restored from archive"}

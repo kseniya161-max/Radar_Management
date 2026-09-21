@@ -55,6 +55,8 @@ async def rank(request: Request, page: int = 1):
             page=page,
         )
 
+        has_ai_ranking = await repo.has_ai_ranked()
+
     return templates.TemplateResponse(
         request=request,
         name="ranked_companies.html",
@@ -63,5 +65,6 @@ async def rank(request: Request, page: int = 1):
             "total": data["total"],
             "page": data["page"],
             "limit": data["limit"],
+            "has_ai_ranking": has_ai_ranking,
         },
     )

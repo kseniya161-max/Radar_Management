@@ -100,3 +100,19 @@ async def sync_and_enrich_companies(
         company = await save_company_if_not_exists(session, company_data)
 
         await enrich_company_data(session, company)
+
+
+async def archive_company(db, inn: str):
+    repo = CompanyRepository(db)
+    company = await repo.change_status(inn)
+    if not company:
+        raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")
+    return company
+
+
+async def restore_company(db, inn: str):
+    repo = CompanyRepository(db)
+    company = await repo.restore(inn)
+    if not company:
+        raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")
+    return company
