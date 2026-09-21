@@ -39,6 +39,10 @@ Radar Management — AI Рейтинг
             <thead>
 
                 <tr>
+                    <th>
+                        🗑️
+                    </th>
+
 
                     <th>Компания</th>
                     <th>ИНН</th>
@@ -63,6 +67,16 @@ Radar Management — AI Рейтинг
                 {% for company in companies %}
 
                 <tr>
+                    <td>
+                        <button
+                            type="button"
+                            class="archive-button"
+                            data-inn="{{ company.inn }}"
+                            title="В архив"
+                        >
+                            🗑️
+                        </button>
+                    </td>
 
                     <td>
                         {{ company.name }}
@@ -118,7 +132,7 @@ Radar Management — AI Рейтинг
 
                 <tr>
 
-                    <td colspan="12" class="empty-state">
+                    <td colspan="13" class="empty-state">
                         Компании пока не оценены AI
                     </td>
 
@@ -187,5 +201,23 @@ Radar Management — AI Рейтинг
 {% endif %}
 
 </section>
+<script>
+document.querySelectorAll(".archive-button").forEach(button => {
+    button.addEventListener("click", async () => {
+        const inn = button.dataset.inn;
+        try {
+            const response = await fetch(`/companies/${inn}/archive`, {
+                method: "POST"
+            });
+            if (!response.ok) {
+                throw new Error("Не удалось архивировать компанию");
+            }
+            location.reload();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+});
+</script>
 
 {% endblock %}
