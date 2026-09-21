@@ -31,7 +31,7 @@ Radar Management — AI Рейтинг
 
     </div>
 
-
+    {% if has_ai_ranking %}
     <div class="table-wrapper ranked-table-wrapper">
 
         <table class="companies-table">
@@ -135,39 +135,56 @@ Radar Management — AI Рейтинг
 
     {% if total > limit %}
 
-    <div class="pagination ranked-pagination">
+<div class="pagination ranked-pagination">
 
-        {% if page > 1 %}
-
-        <a
-            href="/web/ranked?page={{ page - 1 }}"
-            class="ranked-secondary-button"
-        >
-            ← Назад
-        </a>
-
-        {% endif %}
-
-
-        <span>
-            Страница {{ page }}
-        </span>
-
-
-        {% if page * limit < total %}
-
-        <a
-            href="/web/ranked?page={{ page + 1 }}"
-            class="ranked-secondary-button"
-        >
-            Далее →
-        </a>
-
-        {% endif %}
-
-    </div>
-
+    {% if page > 1 %}
+    <a
+        href="/web/ranked?page={{ page - 1 }}"
+        class="ranked-secondary-button"
+    >
+        ← Назад
+    </a>
     {% endif %}
+
+    <span>
+        Страница {{ page }}
+    </span>
+
+    {% if page * limit < total %}
+    <a
+        href="/web/ranked?page={{ page + 1 }}"
+        class="ranked-secondary-button"
+    >
+        Далее →
+    </a>
+    {% endif %}
+
+</div>
+
+{% endif %}
+
+
+{% else %}
+
+<div class="ranking-empty-state">
+
+    <h2>AI рейтинг ещё не сформирован</h2>
+
+    <p>
+        Сначала выполните AI Score для компаний,
+        затем здесь появится ранжированный список.
+    </p>
+
+    <a
+        href="/web/companies"
+        class="ranked-secondary-button"
+    >
+        Перейти к моим компаниям
+    </a>
+
+</div>
+
+{% endif %}
 
 </section>
 

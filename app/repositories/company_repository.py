@@ -91,3 +91,8 @@ class CompanyRepository:
 
         result = await self.session.execute(select(Company))
         return result.scalars().all()
+
+
+    async def has_ai_ranked(self) -> bool:
+        result = await self.session.execute(select(Company.id).where(Company.ai_priority.is_not(None)).limit(1))
+        return result.scalar_one_or_none() is not None
