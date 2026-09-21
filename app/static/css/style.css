@@ -396,75 +396,83 @@ body {
 
 /* COLUMN WIDTHS */
 
-/* 1. Компания */
+
+/* 1. Кнопка архива */
 .companies-table th:nth-child(1),
 .companies-table td:nth-child(1) {
+    width: 60px;
+    text-align: center;
+}
+
+/* 2. Компания */
+.companies-table th:nth-child(2),
+.companies-table td:nth-child(2) {
     width: 220px;
 }
 
-/* 2. ИНН */
-.companies-table th:nth-child(2),
-.companies-table td:nth-child(2) {
+/* 3. ИНН */
+.companies-table th:nth-child(3),
+.companies-table td:nth-child(3) {
     width: 115px;
 }
 
-/* 3. Телефон */
-.companies-table th:nth-child(3),
-.companies-table td:nth-child(3) {
+/* 4. Телефон */
+.companies-table th:nth-child(4),
+.companies-table td:nth-child(4) {
     width: 150px;
 }
 
-/* 4. Email */
-.companies-table th:nth-child(4),
-.companies-table td:nth-child(4) {
+/* 5. Email */
+.companies-table th:nth-child(5),
+.companies-table td:nth-child(5) {
     width: 200px;
 }
 
-/* 5. Регион */
-.companies-table th:nth-child(5),
-.companies-table td:nth-child(5) {
+/* 6. Регион */
+.companies-table th:nth-child(6),
+.companies-table td:nth-child(6) {
     width: 160px;
 }
 
-/* 6. Дата регистрации */
-.companies-table th:nth-child(6),
-.companies-table td:nth-child(6) {
+/* 7. Дата регистрации */
+.companies-table th:nth-child(7),
+.companies-table td:nth-child(7) {
     width: 120px;
 }
 
-/* 7. Выручка 2024 */
-.companies-table th:nth-child(7),
-.companies-table td:nth-child(7) {
-    width: 110px;
-}
-
-/* 8. Выручка 2025 */
+/* 8. Выручка 2024 */
 .companies-table th:nth-child(8),
 .companies-table td:nth-child(8) {
     width: 110px;
 }
 
-/* 9. Рост выручки */
+/* 9. Выручка 2025 */
 .companies-table th:nth-child(9),
 .companies-table td:nth-child(9) {
-    width: 120px;
+    width: 110px;
 }
 
-/* 10. Рост прибыли */
+/* 10. Рост выручки */
 .companies-table th:nth-child(10),
 .companies-table td:nth-child(10) {
     width: 120px;
 }
 
-/* 11. AI Priority */
+/* 11. Рост прибыли */
 .companies-table th:nth-child(11),
 .companies-table td:nth-child(11) {
+    width: 120px;
+}
+
+/* 12. AI Priority */
+.companies-table th:nth-child(12),
+.companies-table td:nth-child(12) {
     width: 110px;
 }
 
-/* 12. AI Risk */
-.companies-table th:nth-child(12),
-.companies-table td:nth-child(12) {
+/* 13. AI Risk */
+.companies-table th:nth-child(13),
+.companies-table td:nth-child(13) {
     width: 100px;
 }
 
@@ -570,4 +578,34 @@ body {
 
 .ranked-pagination {
     margin-top: 25px;
+}
+
+
+/* ARCHIVE BUTTON */
+
+.archive-button {
+    background: none;
+    border: none;
+
+    padding: 4px;
+
+    font-size: 18px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    border-radius: 6px;
+
+    transition:
+        background 0.15s,
+        transform 0.15s;
+}
+
+.archive-button:hover {
+    background: #f0f2f6;
+    transform: scale(1.1);
+}
+
+.archive-button:active {
+    transform: scale(0.95);
 }
