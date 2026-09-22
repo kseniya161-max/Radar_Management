@@ -12,7 +12,7 @@ from app.clients.company_api_client import (
 from app.core.logger import logger
 from app.exceptions.checko import CheckoAPIError
 from app.exceptions.company_exc import CompanyNotFoundError
-from app.models.company import Company
+from app.models.company import Company, Progress
 from app.repositories.company_repository import CompanyRepository
 
 
@@ -116,3 +116,21 @@ async def restore_company(db, inn: str):
     if not company:
         raise CompanyNotFoundError(f"Company with INN {inn} NOT FOUND")
     return company
+
+
+async def bulk_archive(db,inns:list[str]) -> int:
+    repo = CompanyRepository(db)
+    count = await repo.bulk_change_progress(inns, Progress.ARCHIVED)
+    return count
+
+
+
+async def bulk_restore(db,inns:list[str]) -> int:
+    repo = CompanyRepository(db)
+    count = await repo.bulk_change_progress(inns, Progress.ACTIVE)
+    return count
+
+
+
+
+
