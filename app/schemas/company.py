@@ -100,4 +100,3 @@ class SCompanyTaskResponse(BaseModel):
 
 class SBulkInnsRequest(BaseModel):
     inns: list[str]
-
