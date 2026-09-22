@@ -73,11 +73,12 @@ async def get_archived(request: Request, session: SessionDep, page: int = 1):
 
     repo = CompanyRepository(session)
     data = await repo.get_archive_paginate(limit=20, page=page)
+
     return templates.TemplateResponse(
         request=request,
         name="archived_companies.html",
         context={
-            "companies": data["companies"],
+            "companies": data["items"],
             "total": data["total"],
             "page": data["page"],
             "limit": data["limit"],

@@ -135,18 +135,16 @@ class CompanyRepository:
         )
         total_amount = await self.session.scalar(total_amount_company)
         offset = (page - 1) * limit
-        total_company = (
-            select(Company)
-            .order_by(Company.id.desc())
-            .where(Company.progress == Progress.ARCHIVED)
-            .offset(offset)
-            .limit(limit)
-        )
+        total_company = (select(Company)
+        .where(Company.progress == Progress.ARCHIVED)
+        .order_by(Company.id.desc())
+        .offset(offset)
+        .limit(limit))
         result = await self.session.execute(total_company)
-        companies = result.scalars().all()
+        items = result.scalars().all()
         return {
             "total": total_amount,
             "limit": limit,
             "page": page,
-            "companies": companies,
+            "items": items
         }
