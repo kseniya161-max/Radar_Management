@@ -16,12 +16,24 @@ Radar Management — Архив
             </p>
         </div>
     </div>
+        <div id="bulk-panel" class="bulk-panel" hidden>
+        <span class="bulk-panel-count">
+            Выбрано: <strong id="bulk-count">0</strong>
+        </span>
+        <button type="button" id="bulk-restore" class="secondary-button">
+            Вернуть
+        </button>
+    </div>
     <div class="table-wrapper">
 
         <table class="companies-table">
 
             <thead>
-                <tr>
+
+                   <tr>
+                    <th class="checkbox-cell">
+                        <input type="checkbox" id="select-all">
+                    </th>
                     <th></th>
                     <th>Компания</th>
                     <th>ИНН</th>
@@ -48,13 +60,20 @@ Radar Management — Архив
                 {% for company in companies %}
 
                 <tr>
-                    <td>
-                        <button
-                            type="button"
-                            class="restore-button"
-                            data-inn="{{ company.inn }}"
-                            title="Из архива"
-                        >
+                        <td class="checkbox-cell">
+                            <input
+                                type="checkbox"
+                                class="row-checkbox"
+                                data-inn="{{ company.inn }}"
+                            >
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                class="restore-button"
+                                data-inn="{{ company.inn }}"
+                                title="Из архива"
+                            >
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                  stroke-linejoin="round">
@@ -117,7 +136,7 @@ Radar Management — Архив
                 {% else %}
 
                 <tr>
-                    <td colspan="13" class="empty-state">
+                    <td colspan="14" class="empty-state">
                         Нет компаний в архиве
                     </td>
                 </tr>
@@ -179,6 +198,51 @@ document.querySelectorAll(".restore-button").forEach(button => {
             alert(error.message);
         }
     });
+});
+</script>
+<script>
+const bulkPanel = document.getElementById("bulk-panel");
+const bulkCount = document.getElementById("bulk-count");
+const selectAll = document.getElementById("select-all");
+const rowCheckboxes = document.querySelectorAll(".row-checkbox");
+
+function updateBulkPanel() {
+    const checked = document.querySelectorAll(".row-checkbox:checked");
+    bulkCount.textContent = checked.length;
+    bulkPanel.hidden = checked.length === 0;
+}
+
+selectAll.addEventListener("change", () => {
+    rowCheckboxes.forEach(cb => { cb.checked = selectAll.checked; });
+    updateBulkPanel();
+});
+
+rowCheckboxes.forEach(cb => {
+    cb.addEventListener("change", updateBulkPanel);
+});
+
+document.getElementById("bulk-restore").addEventListener("click", async () => {
+    const inns = Array.from(
+        document.querySelectorAll(".row-checkbox:checked")
+    ).map(cb => cb.dataset.inn);
+
+    if (inns.length === 0) return;
+
+    try {
+        const response = await fetch("/companies/bulk/restore", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ inns: inns })
+        });
+
+        if (!response.ok) {
+            throw new Error("Не удалось вернуть компании из архива");
+        }
+
+        location.reload();
+    } catch (error) {
+        alert(error.message);
+    }
 });
 </script>
 
