@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}
+Radar Management — Архив
+{% endblock %}
+
+{% block content %}
+
+<section class="companies-page">
+
+    <div class="page-header">
+        <div>
+            <h1>Мой Архив</h1>
+            <p>
+                Всего компаний: {{ total }}
+            </p>
+        </div>
+    </div>
+    <div class="table-wrapper">
+
+        <table class="companies-table">
+
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Компания</th>
+                    <th>ИНН</th>
+
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Регион</th>
+
+                    <th>Дата регистрации</th>
+                    <th>Выручка 2024</th>
+                    <th>Выручка 2025</th>
+
+                    <th>Рост выручки</th>
+                    <th>Рост прибыли</th>
+
+                    <th>AI Priority</th>
+                    <th>AI Risk</th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for company in companies %}
+
+                <tr>
+                    <td>
+                        <button
+                            type="button"
+                            class="restore-button"
+                            data-inn="{{ company.inn }}"
+                            title="Из архива"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        </button>
+                    </td>
+
+
+                    <td>
+                        {{ company.name }}
+                    </td>
+
+                    <td>
+                        {{ company.inn }}
+                    </td>
+
+
+                    <td>
+                        {{ company.phone or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.email or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.region or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.registration_date or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.revenue_2024 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.revenue_2025 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.revenue_growth_3 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.profit_growth_3 or "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.ai_priority if company.ai_priority is not none else "—" }}
+                    </td>
+
+                    <td>
+                        {{ company.ai_risk if company.ai_risk is not none else "—" }}
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="13" class="empty-state">
+                        Нет компаний в архиве
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% if total > limit %}
+
+    <div class="pagination">
+
+        {% if page > 1 %}
+            <a
+                href="/web/archived?page={{ page - 1 }}"
+                class="secondary-button"
+            >
+                ← Назад
+            </a>
+        {% endif %}
+
+        <span>
+            Страница {{ page }}
+        </span>
+
+        {% if page * limit < total %}
+            <a
+                href="/web/archived?page={{ page + 1 }}"
+                class="secondary-button"
+            >
+                Далее →
+            </a>
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+<script>
+document.querySelectorAll(".restore-button").forEach(button => {
+    button.addEventListener("click", async () => {
+        const inn = button.dataset.inn;
+        try {
+            const response = await fetch(`/companies/${inn}/restore`, {
+                method: "POST"
+            });
+            if (!response.ok) {
+                throw new Error("Не удалось вернуть компанию из архива");
+            }
+            location.reload();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+});
+</script>
+
+{% endblock %}

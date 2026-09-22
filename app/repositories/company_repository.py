@@ -126,3 +126,25 @@ class CompanyRepository:
             return None
         company.progress = Progress.ACTIVE
         return company
+
+    async def get_archive_paginate(self, limit: int = 20, page: int = 1):
+        total_amount_company = (
+            select(func.count())
+            .select_from(Company)
+            .where(Company.progress == Progress.ARCHIVED)
+        )
+        total_amount = await self.session.scalar(total_amount_company)
+        offset = (page - 1) * limit
+        total_company = (select(Company)
+        .where(Company.progress == Progress.ARCHIVED)
+        .order_by(Company.id.desc())
+        .offset(offset)
+        .limit(limit))
+        result = await self.session.execute(total_company)
+        items = result.scalars().all()
+        return {
+            "total": total_amount,
+            "limit": limit,
+            "page": page,
+            "items": items
+        }

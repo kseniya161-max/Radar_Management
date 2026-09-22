@@ -618,3 +618,42 @@ body {
 .archive-button svg {
     display: block;
 }
+
+
+/* Restore ARCHIVE BUTTON */
+
+.restore-button {
+    background: none;
+    border: none;
+
+    padding: 4px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #697386;
+
+    cursor: pointer;
+
+    border-radius: 6px;
+
+    transition:
+        background 0.15s,
+        color 0.15s,
+        transform 0.15s;
+}
+
+.restore-button:hover {
+    background: #f0f2f6;
+    color: #2e7d32;
+    transform: scale(1.1);
+}
+
+.restore-button:active {
+    transform: scale(0.95);
+}
+
+.restore-button svg {
+    display: block;
+}
