@@ -9,7 +9,8 @@ from app.schemas.company import (
     SCompanyMessageResponse,
     SCompanyStatusResponse,
     SCompanyResponse,
-    SCompanyPageResponse, SBulkInnsRequest,
+    SCompanyPageResponse,
+    SBulkInnsRequest,
 )
 from app.services.company_service import (
     update_company_finances,
@@ -18,7 +19,9 @@ from app.services.company_service import (
     get_company_by_inn,
     get_all_companies,
     archive_company,
-    restore_company, bulk_archive, bulk_restore,
+    restore_company,
+    bulk_archive,
+    bulk_restore,
 )
 
 router_companies = APIRouter(prefix="/companies", tags=["Companies"])
@@ -48,16 +51,17 @@ async def create_companies(
         "message": f"Синхронизация для ОКВЭД {okved_code} завершена",
     }
 
-@router_companies.post('/bulk/archive')
-async def bulk_archive_companies(payload: SBulkInnsRequest,session: SessionDep):
+
+@router_companies.post("/bulk/archive")
+async def bulk_archive_companies(payload: SBulkInnsRequest, session: SessionDep):
     count = await bulk_archive(session, payload.inns)
     await session.commit()
     return {"status": "ok", "count": count}
 
 
-@router_companies.post('/bulk/restore')
-async def bulk_restore_companies(payload: SBulkInnsRequest,session: SessionDep):
-    count = await bulk_restore(session,payload.inns)
+@router_companies.post("/bulk/restore")
+async def bulk_restore_companies(payload: SBulkInnsRequest, session: SessionDep):
+    count = await bulk_restore(session, payload.inns)
     await session.commit()
     return {"status": "ok", "count": count}
 
@@ -124,6 +128,3 @@ async def restore_company_status(inn: str, session: SessionDep):
     await restore_company(session, inn)
     await session.commit()
     return {"status": "restored from archive"}
-
-
-
