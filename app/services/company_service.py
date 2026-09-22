@@ -40,8 +40,8 @@ def update_company_growth(company: Company):
     company.profit_growth_3 = growth_calc(company.profit_2025, company.profit_2024)
 
 
-async def save_company_if_not_exists(session: AsyncSession, company_data):
-    repo = CompanyRepository(session)
+async def save_company_if_not_exists(db: AsyncSession, company_data):
+    repo = CompanyRepository(db)
     return await repo.save_if_not_exists(company_data)
 
 
@@ -71,9 +71,9 @@ async def update_company_finances(db: AsyncSession, company: Company):
     update_company_growth(company)
 
 
-async def enrich_company_data(session: AsyncSession, company: Company):
+async def enrich_company_data(db: AsyncSession, company: Company):
     try:
-        await update_company_contacts(session, company)
+        await update_company_contacts(db, company)
     except CheckoAPIError as e:
         logger.warning(
             "Failed to update contacts for %s: %s",
@@ -81,7 +81,7 @@ async def enrich_company_data(session: AsyncSession, company: Company):
             e,
         )
     try:
-        await update_company_finances(session, company)
+        await update_company_finances(db, company)
     except CheckoAPIError as e:
         logger.warning(
             "Failed to update finances for %s: %s",
@@ -91,18 +91,18 @@ async def enrich_company_data(session: AsyncSession, company: Company):
 
 
 async def sync_and_enrich_companies(
-    okved_code: str, session: AsyncSession, page: int = 1, region: str | None = None
+    okved_code: str, db: AsyncSession, page: int = 1, region: str | None = None
 ):
     data = await search_companies_by_okved(okved_code, page, region)
 
     for raw_company in data["data"]["Записи"]:
         company_data = parse_company(raw_company)
-        company = await save_company_if_not_exists(session, company_data)
+        company = await save_company_if_not_exists(db, company_data)
 
-        await enrich_company_data(session, company)
+        await enrich_company_data(db, company)
 
 
-async def archive_company(db, inn: str):
+async def archive_company(db: AsyncSession, inn: str):
     repo = CompanyRepository(db)
     company = await repo.change_status(inn)
     if not company:
@@ -110,7 +110,7 @@ async def archive_company(db, inn: str):
     return company
 
 
-async def restore_company(db, inn: str):
+async def restore_company(db: AsyncSession, inn: str):
     repo = CompanyRepository(db)
     company = await repo.restore(inn)
     if not company:
@@ -118,19 +118,13 @@ async def restore_company(db, inn: str):
     return company
 
 
-async def bulk_archive(db,inns:list[str]) -> int:
+async def bulk_archive(db: AsyncSession, inns: list[str]) -> int:
     repo = CompanyRepository(db)
     count = await repo.bulk_change_progress(inns, Progress.ARCHIVED)
     return count
 
 
-
-async def bulk_restore(db,inns:list[str]) -> int:
+async def bulk_restore(db: AsyncSession, inns: list[str]) -> int:
     repo = CompanyRepository(db)
     count = await repo.bulk_change_progress(inns, Progress.ACTIVE)
     return count
-
-
-
-
-
