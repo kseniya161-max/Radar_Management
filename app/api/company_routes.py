@@ -48,6 +48,19 @@ async def create_companies(
         "message": f"Синхронизация для ОКВЭД {okved_code} завершена",
     }
 
+@router_companies.post('/bulk/archive')
+async def bulk_archive_companies(payload: SBulkInnsRequest,session: SessionDep):
+    count = await bulk_archive(session, payload.inns)
+    await session.commit()
+    return {"status": "ok", "count": count}
+
+
+@router_companies.post('/bulk/restore')
+async def bulk_restore_companies(payload: SBulkInnsRequest,session: SessionDep):
+    count = await bulk_restore(session,payload.inns)
+    await session.commit()
+    return {"status": "ok", "count": count}
+
 
 @router_companies.post("/{inn}/finance", response_model=SCompanyStatusResponse)
 async def update_finance(inn: str, session: SessionDep):
@@ -113,15 +126,4 @@ async def restore_company_status(inn: str, session: SessionDep):
     return {"status": "restored from archive"}
 
 
-@router_companies.post('/bulk/archive')
-async def bulk_archive_companies(payload: SBulkInnsRequest,session: SessionDep):
-    count = await bulk_archive(session, payload.inns)
-    await session.commit()
-    return {"status": "ok", "count": count}
 
-
-@router_companies.post('/bulk/restore')
-async def bulk_restore_companies(payload: SBulkInnsRequest,session: SessionDep):
-    count = await bulk_restore(session,payload.inns)
-    await session.commit()
-    return {"status": "ok", "count": count}
