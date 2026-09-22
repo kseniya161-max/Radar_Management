@@ -13,7 +13,8 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router_web.get("/companies", include_in_schema=False)
 async def companies_page(
-    request: Request, session: SessionDep,
+    request: Request,
+    session: SessionDep,
     page: int = 1,
 ):
     repo = CompanyRepository(session)
@@ -67,7 +68,7 @@ async def rank(request: Request, session: SessionDep, page: int = 1):
     )
 
 
-@router_web.get("/archived",include_in_schema=False)
+@router_web.get("/archived", include_in_schema=False)
 async def get_archived(request: Request, session: SessionDep, page: int = 1):
 
     repo = CompanyRepository(session)
@@ -82,4 +83,3 @@ async def get_archived(request: Request, session: SessionDep, page: int = 1):
             "limit": data["limit"],
         },
     )
-
