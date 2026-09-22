@@ -1,4 +1,6 @@
-from sqlalchemy import select, func, case
+from typing import List
+
+from sqlalchemy import select, func, case, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.company import Company, Progress
@@ -148,3 +150,13 @@ class CompanyRepository:
             "page": page,
             "items": items
         }
+
+
+
+    async def bulk_change_progress(self, inns:list[str], new_progress:Progress) -> int:
+        stmt= update(Company).where(Company.inn.in_(inns)).values(progress = new_progress)
+        result = await self.session.execute(stmt)
+        total_result = result.rowcount
+        return total_result
+
+
