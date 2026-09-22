@@ -96,3 +96,8 @@ class SCompanyPageResponse(BaseModel):
 class SCompanyTaskResponse(BaseModel):
     status: str
     task_id: str
+
+
+class SBulkInnsRequest(BaseModel):
+    inns: list[str]
+
