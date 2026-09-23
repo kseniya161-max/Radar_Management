@@ -695,3 +695,24 @@ body {
 .bulk-panel-count strong {
     font-weight: 700;
 }
+
+/* DANGER BUTTON */
+
+.danger-button {
+    display: inline-block;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #a52a2a;
+    border: 1px solid #d9b9c1;
+    border-radius: 8px;
+    padding: 11px 18px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.danger-button:hover {
+    background: #fff0f0;
+    border-color: #a52a2a;
+}
