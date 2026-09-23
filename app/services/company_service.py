@@ -128,3 +128,10 @@ async def bulk_restore(db: AsyncSession, inns: list[str]) -> int:
     repo = CompanyRepository(db)
     count = await repo.bulk_change_progress(inns, Progress.ACTIVE)
     return count
+
+
+async def bulk_soft_deleted(db: AsyncSession, inns: list[str]) -> int:
+    repo = CompanyRepository(db)
+    count = await repo.bulk_soft_delete(inns)
+    return count
+
