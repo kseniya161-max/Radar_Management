@@ -1,5 +1,3 @@
-from typing import List
-
 from sqlalchemy import select, func, case, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,9 +20,6 @@ class CompanyRepository:
             if company.is_deleted == True:
                 company.is_deleted = False
             return company
-
-
-
         company = Company(**company_data)
         self.session.add(company)
         return company
