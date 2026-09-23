@@ -1,5 +1,3 @@
-from typing import List
-
 from sqlalchemy import select, func, case, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,15 +9,17 @@ class CompanyRepository:
         self.session = session
 
     async def get_by_inn(self, inn: str) -> Company | None:
-        company = await self.session.execute(select(Company).where(Company.inn == inn))
+        company = await self.session.execute(select(Company).where(Company.inn == inn).where(Company.is_deleted == False))
         return company.scalar_one_or_none()
 
     async def save_if_not_exists(self, company_data: dict) -> Company:
         inn = company_data["inn"]
-        company = await self.get_by_inn(inn)
+        company = await self.session.execute(select(Company).where(Company.inn == inn))
+        company = company.scalar_one_or_none()
         if company:
+            if company.is_deleted == True:
+                company.is_deleted = False
             return company
-
         company = Company(**company_data)
         self.session.add(company)
         return company
@@ -32,7 +32,7 @@ class CompanyRepository:
         total_stmt = (
             select(func.count())
             .select_from(Company)
-            .where(Company.progress == Progress.ACTIVE)
+            .where(Company.progress == Progress.ACTIVE).where(Company.is_deleted == False)
         )
         total = await self.session.scalar(total_stmt)
 
@@ -54,7 +54,7 @@ class CompanyRepository:
 
         stmt = (
             select(Company)
-            .where(Company.progress == Progress.ACTIVE)
+            .where(Company.progress == Progress.ACTIVE).where(Company.is_deleted == False)
             .order_by(
                 priority.asc(),
                 Company.revenue_growth_3.desc().nulls_last(),
@@ -77,7 +77,7 @@ class CompanyRepository:
         offset = (page - 1) * limit
         result = await self.session.execute(
             select(Company)
-            .where(Company.progress == Progress.ACTIVE)
+            .where(Company.progress == Progress.ACTIVE).where(Company.is_deleted == False)
             .order_by(Company.ai_priority.desc().nulls_last())
             .offset(offset)
             .limit(limit)
@@ -86,7 +86,7 @@ class CompanyRepository:
         total_result = await self.session.execute(
             select(func.count())
             .select_from(Company)
-            .where(Company.progress == Progress.ACTIVE)
+            .where(Company.progress == Progress.ACTIVE).where(Company.is_deleted == False)
         )
 
         total = total_result.scalar_one()
@@ -100,7 +100,7 @@ class CompanyRepository:
 
     async def get_all_companies(self) -> list[Company]:
 
-        result = await self.session.execute(select(Company))
+        result = await self.session.execute(select(Company).where(Company.is_deleted == False))
         return result.scalars().all()
 
     async def has_ai_ranked(self) -> bool:
@@ -108,7 +108,7 @@ class CompanyRepository:
             select(Company.id)
             .where(
                 Company.progress == Progress.ACTIVE, Company.ai_priority.is_not(None)
-            )
+            ).where(Company.is_deleted == False)
             .limit(1)
         )
         return result.scalar_one_or_none() is not None
@@ -133,13 +133,13 @@ class CompanyRepository:
         total_amount_company = (
             select(func.count())
             .select_from(Company)
-            .where(Company.progress == Progress.ARCHIVED)
+            .where(Company.progress == Progress.ARCHIVED).where(Company.is_deleted == False)
         )
         total_amount = await self.session.scalar(total_amount_company)
         offset = (page - 1) * limit
         total_company = (
             select(Company)
-            .where(Company.progress == Progress.ARCHIVED)
+            .where(Company.progress == Progress.ARCHIVED).where(Company.is_deleted == False)
             .order_by(Company.id.desc())
             .offset(offset)
             .limit(limit)
@@ -152,8 +152,15 @@ class CompanyRepository:
         self, inns: list[str], new_progress: Progress
     ) -> int:
         stmt = (
-            update(Company).where(Company.inn.in_(inns)).values(progress=new_progress)
+            update(Company).where(Company.inn.in_(inns)).where(Company.is_deleted == False).values(progress=new_progress)
         )
+        result = await self.session.execute(stmt)
+        total_result = result.rowcount
+        return total_result
+
+
+    async def bulk_soft_delete(self, inns: list[str]):
+        stmt = (update(Company).where(Company.inn.in_(inns)).where(Company.is_deleted == False).values(is_deleted = True))
         result = await self.session.execute(stmt)
         total_result = result.rowcount
         return total_result

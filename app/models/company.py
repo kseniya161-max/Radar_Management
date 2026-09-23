@@ -50,3 +50,4 @@ class Company(Base):
         server_default="active",
         index=True,
     )
+    is_deleted: Mapped[bool] = mapped_column(default=False, server_default="false", nullable=False, index=True)

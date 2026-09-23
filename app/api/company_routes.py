@@ -1,9 +1,7 @@
-from fastapi import APIRouter, Query
+from fastapi import Query
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import SessionDep
 from fastapi import APIRouter
-
-from app.repositories.company_repository import CompanyRepository
 from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,
@@ -21,7 +19,7 @@ from app.services.company_service import (
     archive_company,
     restore_company,
     bulk_archive,
-    bulk_restore,
+    bulk_restore, bulk_soft_deleted,
 )
 
 router_companies = APIRouter(prefix="/companies", tags=["Companies"])
@@ -62,6 +60,12 @@ async def bulk_archive_companies(payload: SBulkInnsRequest, session: SessionDep)
 @router_companies.post("/bulk/restore")
 async def bulk_restore_companies(payload: SBulkInnsRequest, session: SessionDep):
     count = await bulk_restore(session, payload.inns)
+    await session.commit()
+    return {"status": "ok", "count": count}
+
+@router_companies.post("/bulk/delete")
+async def bulk_delete_companies(payload: SBulkInnsRequest, session: SessionDep):
+    count = await bulk_soft_deleted(session, payload.inns)
     await session.commit()
     return {"status": "ok", "count": count}
 
@@ -128,3 +132,6 @@ async def restore_company_status(inn: str, session: SessionDep):
     await restore_company(session, inn)
     await session.commit()
     return {"status": "restored from archive"}
+
+
+
