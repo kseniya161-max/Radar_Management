@@ -1,9 +1,7 @@
-from fastapi import APIRouter, Query
+from fastapi import Query
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import SessionDep
 from fastapi import APIRouter
-
-from app.repositories.company_repository import CompanyRepository
 from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,
