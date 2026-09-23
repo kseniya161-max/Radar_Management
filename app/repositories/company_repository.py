@@ -157,3 +157,10 @@ class CompanyRepository:
         result = await self.session.execute(stmt)
         total_result = result.rowcount
         return total_result
+
+
+    async def bulk_soft_delete(self, inns: list[str]):
+        stmt = (update(Company).where(Company.inn.in_(inns)).where(Company.is_deleted == False).values(is_deleted = True))
+        result = await self.session.execute(stmt)
+        total_result = result.rowcount
+        return total_result
