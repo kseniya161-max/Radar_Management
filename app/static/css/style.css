@@ -740,3 +740,80 @@ body {
     color: #172033;
     font-weight: 700;
 }
+
+
+/* STICKY COLUMNS */
+
+/* 1. Чекбокс */
+.companies-table th:nth-child(1),
+.companies-table td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+}
+
+/* 2. Кнопка архива */
+.companies-table th:nth-child(2),
+.companies-table td:nth-child(2) {
+    position: sticky;
+    left: 40px;
+    z-index: 3;
+}
+
+/* 3. Компания */
+.companies-table th:nth-child(3),
+.companies-table td:nth-child(3) {
+    position: sticky;
+    left: 100px;
+    z-index: 3;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Фон ячеек — иначе при наложении просвечивает */
+.companies-table td:nth-child(1),
+.companies-table td:nth-child(2),
+.companies-table td:nth-child(3) {
+    background: #ffffff;
+}
+
+.companies-table th:nth-child(1),
+.companies-table th:nth-child(2),
+.companies-table th:nth-child(3) {
+    background: #f8f9fb;
+}
+
+/* Hover на строке для зафиксированных */
+.companies-table tbody tr:hover td:nth-child(1),
+.companies-table tbody tr:hover td:nth-child(2),
+.companies-table tbody tr:hover td:nth-child(3) {
+    background: #fafbfc;
+}
+
+/* Для ranked-страницы свой цвет шапки */
+.ranked-page .companies-table th:nth-child(1),
+.ranked-page .companies-table th:nth-child(2),
+.ranked-page .companies-table th:nth-child(3) {
+    background: #faf1f3;
+}
+
+/* TOP SCROLLBAR */
+
+.top-scrollbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    height: 14px;
+
+    background: transparent;
+
+    margin-bottom: 4px;
+}
+
+.top-scrollbar-inner {
+    height: 1px;
+    width: 1750px;
+}

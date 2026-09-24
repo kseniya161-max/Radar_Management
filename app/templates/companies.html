@@ -33,7 +33,9 @@ Radar Management — Мои компании
         </button>
     </div>
 
-
+    <div class="top-scrollbar" id="top-scrollbar">
+    <div class="top-scrollbar-inner"></div>
+    </div>
     <div class="table-wrapper">
 
         <table class="companies-table">
@@ -320,6 +322,30 @@ document.getElementById("bulk-archive").addEventListener("click", async () => {
     } catch (error) {
         alert(error.message);
     }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const topScrollbar = document.getElementById("top-scrollbar");
+    const tableWrapper = document.querySelector(".table-wrapper");
+
+    if (!topScrollbar || !tableWrapper) return;
+
+    let syncing = false;
+
+    topScrollbar.addEventListener("scroll", () => {
+        if (syncing) return;
+        syncing = true;
+        tableWrapper.scrollLeft = topScrollbar.scrollLeft;
+        syncing = false;
+    });
+
+    tableWrapper.addEventListener("scroll", () => {
+        if (syncing) return;
+        syncing = true;
+        topScrollbar.scrollLeft = tableWrapper.scrollLeft;
+        syncing = false;
+    });
 });
 </script>
 
