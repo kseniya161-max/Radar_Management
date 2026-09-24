@@ -13,9 +13,7 @@ Radar Management — AI Рейтинг
         <div>
             <h1>AI Рейтинг компаний</h1>
 
-            <p>
-                Всего компаний: {{ total }}
-            </p>
+
         </div>
 
         <div class="page-actions">
@@ -30,7 +28,10 @@ Radar Management — AI Рейтинг
         </div>
 
     </div>
-
+        <div class="stats-row">
+    <span>Оценено AI: <strong>{{ count_rank }}</strong></span>
+    <span>Не оценено AI: <strong>{{ count_not_rank }}</strong></span>
+        </div>
         <div id="bulk-panel" class="bulk-panel" hidden>
         <span class="bulk-panel-count">
             Выбрано: <strong id="bulk-count">0</strong>
