@@ -331,20 +331,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!topScrollbar || !tableWrapper) return;
 
-    let syncing = false;
+    let lastTop = -1;
+    let lastTable = -1;
 
     topScrollbar.addEventListener("scroll", () => {
-        if (syncing) return;
-        syncing = true;
+        if (topScrollbar.scrollLeft === lastTable) return;
+        lastTop = topScrollbar.scrollLeft;
         tableWrapper.scrollLeft = topScrollbar.scrollLeft;
-        syncing = false;
+        lastTable = topScrollbar.scrollLeft;
     });
 
     tableWrapper.addEventListener("scroll", () => {
-        if (syncing) return;
-        syncing = true;
+        if (tableWrapper.scrollLeft === lastTop) return;
+        lastTable = tableWrapper.scrollLeft;
         topScrollbar.scrollLeft = tableWrapper.scrollLeft;
-        syncing = false;
+        lastTop = tableWrapper.scrollLeft;
     });
 });
 </script>

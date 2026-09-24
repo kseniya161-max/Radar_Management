@@ -42,6 +42,9 @@ Radar Management — AI Рейтинг
     </div>
 
     {% if has_ai_ranking %}
+    <div class="top-scrollbar" id="top-scrollbar">
+    <div class="top-scrollbar-inner"></div>
+    </div>
     <div class="table-wrapper ranked-table-wrapper">
 
         <table class="companies-table">
@@ -282,6 +285,32 @@ document.getElementById("bulk-archive").addEventListener("click", async () => {
     } catch (error) {
         alert(error.message);
     }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const topScrollbar = document.getElementById("top-scrollbar");
+    const tableWrapper = document.querySelector(".table-wrapper");
+
+    if (!topScrollbar || !tableWrapper) return;
+
+    let lastTop = -1;
+    let lastTable = -1;
+
+    topScrollbar.addEventListener("scroll", () => {
+        if (topScrollbar.scrollLeft === lastTable) return;
+        lastTop = topScrollbar.scrollLeft;
+        tableWrapper.scrollLeft = topScrollbar.scrollLeft;
+        lastTable = topScrollbar.scrollLeft;
+    });
+
+    tableWrapper.addEventListener("scroll", () => {
+        if (tableWrapper.scrollLeft === lastTop) return;
+        lastTable = tableWrapper.scrollLeft;
+        topScrollbar.scrollLeft = tableWrapper.scrollLeft;
+        lastTop = tableWrapper.scrollLeft;
+    });
 });
 </script>
 
