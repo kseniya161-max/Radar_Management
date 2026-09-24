@@ -13,9 +13,7 @@ Radar Management — AI Рейтинг
         <div>
             <h1>AI Рейтинг компаний</h1>
 
-            <p>
-                Всего компаний: {{ total }}
-            </p>
+
         </div>
 
         <div class="page-actions">
@@ -30,7 +28,10 @@ Radar Management — AI Рейтинг
         </div>
 
     </div>
-
+        <div class="stats-row">
+    <span>Оценено AI: <strong>{{ count_rank }}</strong></span>
+    <span>Не оценено AI: <strong>{{ count_not_rank }}</strong></span>
+        </div>
         <div id="bulk-panel" class="bulk-panel" hidden>
         <span class="bulk-panel-count">
             Выбрано: <strong id="bulk-count">0</strong>
@@ -41,6 +42,9 @@ Radar Management — AI Рейтинг
     </div>
 
     {% if has_ai_ranking %}
+    <div class="top-scrollbar" id="top-scrollbar">
+    <div class="top-scrollbar-inner"></div>
+    </div>
     <div class="table-wrapper ranked-table-wrapper">
 
         <table class="companies-table">
@@ -220,68 +224,5 @@ Radar Management — AI Рейтинг
 {% endif %}
 
 </section>
-<script>
-document.querySelectorAll(".archive-button").forEach(button => {
-    button.addEventListener("click", async () => {
-        const inn = button.dataset.inn;
-        try {
-            const response = await fetch(`/companies/${inn}/archive`, {
-                method: "POST"
-            });
-            if (!response.ok) {
-                throw new Error("Не удалось архивировать компанию");
-            }
-            location.reload();
-        } catch (error) {
-            alert(error.message);
-        }
-    });
-});
-</script>
-<script>
-const bulkPanel = document.getElementById("bulk-panel");
-const bulkCount = document.getElementById("bulk-count");
-const selectAll = document.getElementById("select-all");
-const rowCheckboxes = document.querySelectorAll(".row-checkbox");
-
-function updateBulkPanel() {
-    const checked = document.querySelectorAll(".row-checkbox:checked");
-    bulkCount.textContent = checked.length;
-    bulkPanel.hidden = checked.length === 0;
-}
-
-selectAll.addEventListener("change", () => {
-    rowCheckboxes.forEach(cb => { cb.checked = selectAll.checked; });
-    updateBulkPanel();
-});
-
-rowCheckboxes.forEach(cb => {
-    cb.addEventListener("change", updateBulkPanel);
-});
-
-document.getElementById("bulk-archive").addEventListener("click", async () => {
-    const inns = Array.from(
-        document.querySelectorAll(".row-checkbox:checked")
-    ).map(cb => cb.dataset.inn);
-
-    if (inns.length === 0) return;
-
-    try {
-        const response = await fetch("/companies/bulk/archive", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ inns: inns })
-        });
-
-        if (!response.ok) {
-            throw new Error("Не удалось архивировать компании");
-        }
-
-        location.reload();
-    } catch (error) {
-        alert(error.message);
-    }
-});
-</script>
 
 {% endblock %}

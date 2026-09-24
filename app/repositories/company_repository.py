@@ -164,3 +164,45 @@ class CompanyRepository:
         result = await self.session.execute(stmt)
         total_result = result.rowcount
         return total_result
+
+
+    async def count_progress_active(self) -> int:
+        company_active = (select(func.count()).select_from(Company).where(Company.progress == Progress.ACTIVE).where(Company.is_deleted == False))
+        result = await self.session.execute(company_active)
+        total_result = result.scalar_one()
+        return total_result
+
+
+    async def count_active_with_phone(self) -> int:
+        company_active_phone = (select(func.count()).select_from(Company).where(Company.progress == Progress.ACTIVE).where(Company.is_deleted == False).where(Company.phone.is_not(None)))
+        result = await self.session.execute(company_active_phone)
+        total_result = result.scalar_one()
+        return total_result
+
+
+    async def count_active_with_finance(self) -> int:
+        company_active_finance = (select(func.count()).select_from(Company).where(Company.progress == Progress.ACTIVE).where(Company.is_deleted ==False).where(Company.revenue_2025.is_not(None)))
+        result = await self.session.execute(company_active_finance)
+        total_result = result.scalar_one()
+        return total_result
+
+
+    async def count_archived(self) -> int:
+        company_archive = (select(func.count()).select_from(Company).where(Company.progress == Progress.ARCHIVED).where(Company.is_deleted == False))
+        result = await self.session.execute(company_archive)
+        total_result = result.scalar_one()
+        return total_result
+
+
+    async def count_ranked(self) -> int:
+        company_score = (select(func.count()).select_from(Company).where(Company.progress == Progress.ACTIVE).where(Company.is_deleted == False).where(Company.ai_priority.is_not(None)))
+        result = await self.session.execute(company_score)
+        total_result = result.scalar_one()
+        return total_result
+
+    async def count_not_ranked(self) -> int:
+        company_not_score = (select(func.count()).select_from(Company).where(Company.progress == Progress.ACTIVE).where(Company.is_deleted == False).where(Company.ai_priority.is_(None)))
+        result = await self.session.execute(company_not_score)
+        total_result = result.scalar_one()
+        return total_result
+

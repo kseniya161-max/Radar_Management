@@ -11,9 +11,6 @@ Radar Management — Мои компании
     <div class="page-header">
         <div>
             <h1>Мои компании</h1>
-            <p>
-                Всего компаний: {{ total }}
-            </p>
         </div>
 
         <div class="page-actions">
@@ -21,7 +18,12 @@ Radar Management — Мои компании
             <button class="secondary-button" id="btn-rank">Ранжировать</button>
         </div>
     </div>
-
+    <div class="stats-row">
+    <span>Активных: <strong>{{ count_active }}</strong></span>
+    <span>С телефоном: <strong>{{ count_phone }}</strong></span>
+    <span>С финансами: <strong>{{ count_finance }}</strong></span>
+    <span>В архиве: <strong>{{ count_archived }}</strong></span>
+</div>
     <div id="bulk-panel" class="bulk-panel" hidden>
         <span class="bulk-panel-count">
             Выбрано: <strong id="bulk-count">0</strong>
@@ -31,7 +33,9 @@ Radar Management — Мои компании
         </button>
     </div>
 
-
+    <div class="top-scrollbar" id="top-scrollbar">
+    <div class="top-scrollbar-inner"></div>
+    </div>
     <div class="table-wrapper">
 
         <table class="companies-table">
@@ -189,136 +193,6 @@ Radar Management — Мои компании
     {% endif %}
 
 </section>
-<script>
-document.getElementById("btn-ai-score").addEventListener("click", async () => {
 
-    const button = document.getElementById("btn-ai-score");
-
-    button.disabled = true;
-    button.textContent = "AI анализирует...";
-
-    try {
-        const response = await fetch("/companies/ai_score_all", {
-            method: "POST"
-        });
-
-        if (!response.ok) {
-            throw new Error("Не удалось запустить AI scoring");
-        }
-
-        const data = await response.json();
-        const taskId = data.task_id;
-
-        const checkStatus = async () => {
-
-            const statusResponse = await fetch(`/tasks/${taskId}`);
-
-            if (!statusResponse.ok) {
-                throw new Error("Не удалось получить статус задачи");
-            }
-
-            const statusData = await statusResponse.json();
-
-            if (statusData.status === "SUCCESS") {
-                location.reload();
-                return;
-            }
-
-            if (
-                statusData.status === "FAILURE" ||
-                statusData.status === "REVOKED"
-            ) {
-                throw new Error("AI scoring завершился с ошибкой");
-            }
-
-            setTimeout(checkStatus, 1000);
-        };
-
-        checkStatus();
-
-    } catch (error) {
-
-        alert(error.message);
-
-        button.disabled = false;
-        button.textContent = "AI Score";
-    }
-});
-</script>
-
-<script>
-document.getElementById("btn-rank").addEventListener("click", function () {
-    window.location.href = "/web/ranked";
-});
-</script>
-<script>
-document.querySelectorAll(".archive-button").forEach(button => {
-    button.addEventListener("click", async () => {
-        const inn = button.dataset.inn;
-        try {
-            const response = await fetch(`/companies/${inn}/archive`, {
-                method: "POST"
-            });
-            if (!response.ok) {
-                throw new Error("Не удалось архивировать компанию");
-            }
-            location.reload();
-        } catch (error) {
-            alert(error.message);
-        }
-    });
-});
-</script>
-
-<script>
-const bulkPanel = document.getElementById("bulk-panel");
-const bulkCount = document.getElementById("bulk-count");
-const selectAll = document.getElementById("select-all");
-const rowCheckboxes = document.querySelectorAll(".row-checkbox");
-
-function updateBulkPanel() {
-    const checked = document.querySelectorAll(".row-checkbox:checked");
-    bulkCount.textContent = checked.length;
-
-    if (checked.length > 0) {
-        bulkPanel.hidden = false;
-    } else {
-        bulkPanel.hidden = true;
-    }
-}
-
-selectAll.addEventListener("change", () => {
-    rowCheckboxes.forEach(cb => { cb.checked = selectAll.checked; });
-    updateBulkPanel();
-});
-
-rowCheckboxes.forEach(cb => {
-    cb.addEventListener("change", updateBulkPanel);
-});
-
-document.getElementById("bulk-archive").addEventListener("click", async () => {
-    const inns = Array.from(
-        document.querySelectorAll(".row-checkbox:checked")
-    ).map(cb => cb.dataset.inn);
-
-    if (inns.length === 0) return;
-
-    try {
-        const response = await fetch("/companies/bulk/archive", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ inns: inns })
-        });
-
-        if (!response.ok) {
-            throw new Error("Не удалось архивировать компании");
-        }
-
-        location.reload();
-    } catch (error) {
-        alert(error.message);
-    }
-});
-</script>
 
 {% endblock %}
