@@ -23,6 +23,11 @@ async def companies_page(
         limit=20,
         page=page,
     )
+    count_active = await repo.count_progress_active()
+    count_phone = await repo.count_active_with_phone()
+    count_finance = await repo.count_active_with_finance()
+    count_archived = await repo.count_archived()
+
 
     return templates.TemplateResponse(
         request=request,
@@ -32,6 +37,10 @@ async def companies_page(
             "total": data["total"],
             "page": data["page"],
             "limit": data["limit"],
+            "count_active": count_active,
+            "count_phone": count_phone,
+            "count_finance": count_finance,
+            "count_archived": count_archived,
         },
     )
 
@@ -84,3 +93,6 @@ async def get_archived(request: Request, session: SessionDep, page: int = 1):
             "limit": data["limit"],
         },
     )
+
+
+
