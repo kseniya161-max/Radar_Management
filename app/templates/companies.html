@@ -11,9 +11,6 @@ Radar Management — Мои компании
     <div class="page-header">
         <div>
             <h1>Мои компании</h1>
-            <p>
-                Всего компаний: {{ total }}
-            </p>
         </div>
 
         <div class="page-actions">
@@ -21,7 +18,12 @@ Radar Management — Мои компании
             <button class="secondary-button" id="btn-rank">Ранжировать</button>
         </div>
     </div>
-
+    <div class="stats-row">
+    <span>Активных: <strong>{{ count_active }}</strong></span>
+    <span>С телефоном: <strong>{{ count_phone }}</strong></span>
+    <span>С финансами: <strong>{{ count_finance }}</strong></span>
+    <span>В архиве: <strong>{{ count_archived }}</strong></span>
+</div>
     <div id="bulk-panel" class="bulk-panel" hidden>
         <span class="bulk-panel-count">
             Выбрано: <strong id="bulk-count">0</strong>
