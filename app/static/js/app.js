@@ -109,10 +109,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const rowCheckboxes = document.querySelectorAll(".row-checkbox");
 
         function updateBulkPanel() {
-            const checked = document.querySelectorAll(".row-checkbox:checked");
-            bulkCount.textContent = checked.length;
-            bulkPanel.hidden = checked.length === 0;
-        }
+    const checked = document.querySelectorAll(".row-checkbox:checked");
+    bulkCount.textContent = checked.length;
+
+    bulkPanel.querySelectorAll("button").forEach(btn => {
+        btn.disabled = checked.length === 0;
+    });
+}
 
         if (selectAll) {
             selectAll.addEventListener("change", () => {
@@ -124,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         rowCheckboxes.forEach(cb => {
             cb.addEventListener("change", updateBulkPanel);
         });
+        updateBulkPanel();
 
             // === BULK EXPORT ===
     const bulkExport = document.getElementById("bulk-export");
@@ -133,7 +137,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.querySelectorAll(".row-checkbox:checked")
             ).map(cb => cb.dataset.inn);
 
-            if (inns.length === 0) return;
+            if (inns.length === 0) {
+    alert("Выберите компании для экспорта");
+    return;
+}
 
             try {
                 const response = await fetch("/companies/export", {

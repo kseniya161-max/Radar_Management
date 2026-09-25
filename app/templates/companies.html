@@ -24,14 +24,14 @@ Radar Management — Мои компании
     <span>С финансами: <strong>{{ count_finance }}</strong></span>
     <span>В архиве: <strong>{{ count_archived }}</strong></span>
 </div>
-    <div id="bulk-panel" class="bulk-panel" hidden>
+    <div id="bulk-panel" class="bulk-panel">
         <span class="bulk-panel-count">
             Выбрано: <strong id="bulk-count">0</strong>
         </span>
-        <button type="button" id="bulk-archive" class="secondary-button">
+        <button type="button" id="bulk-archive" class="secondary-button" disabled>
             В архив
         </button>
-        <button type="button" id="bulk-export" class="secondary-button">
+        <button type="button" id="bulk-export" class="secondary-button" disabled>
             Экспорт CSV
         </button>
     </div>
