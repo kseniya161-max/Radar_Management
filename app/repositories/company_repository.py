@@ -206,3 +206,12 @@ class CompanyRepository:
         total_result = result.scalar_one()
         return total_result
 
+
+    async def get_by_inns(self, inns:list[str]) -> list[Company]:
+        companies = (select(Company).where(Company.inn.in_(inns)).where(Company.is_deleted == False))
+        result = await self.session.execute(companies)
+        total_result = result.scalars().all()
+        return total_result
+
+
+
