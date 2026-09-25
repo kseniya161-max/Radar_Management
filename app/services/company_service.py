@@ -171,10 +171,26 @@ def generate_csv(companies: list) -> str:
                 company.email or "",
                 company.region or "",
                 f'="{company.registration_date}"' if company.registration_date else "",
-                f'="{company.revenue_2024}"' if company.revenue_2024 is not None else "",
-                f'="{company.revenue_2025}"' if company.revenue_2025 is not None else "",
-                f'="{company.revenue_growth_3}"' if company.revenue_growth_3 is not None else "",
-                f'="{company.profit_growth_3}"' if company.profit_growth_3 is not None else "",
+                (
+                    f'="{company.revenue_2024}"'
+                    if company.revenue_2024 is not None
+                    else ""
+                ),
+                (
+                    f'="{company.revenue_2025}"'
+                    if company.revenue_2025 is not None
+                    else ""
+                ),
+                (
+                    f'="{company.revenue_growth_3}"'
+                    if company.revenue_growth_3 is not None
+                    else ""
+                ),
+                (
+                    f'="{company.profit_growth_3}"'
+                    if company.profit_growth_3 is not None
+                    else ""
+                ),
                 company.ai_priority if company.ai_priority is not None else "",
                 company.ai_risk or "",
             ]
