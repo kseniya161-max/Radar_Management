@@ -125,6 +125,42 @@ document.addEventListener("DOMContentLoaded", () => {
             cb.addEventListener("change", updateBulkPanel);
         });
 
+            // === BULK EXPORT ===
+    const bulkExport = document.getElementById("bulk-export");
+    if (bulkExport) {
+        bulkExport.addEventListener("click", async () => {
+            const inns = Array.from(
+                document.querySelectorAll(".row-checkbox:checked")
+            ).map(cb => cb.dataset.inn);
+
+            if (inns.length === 0) return;
+
+            try {
+                const response = await fetch("/companies/export", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ inns: inns })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Не удалось выгрузить компании");
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "companies.csv";
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    }
+
 
         // === BULK ARCHIVE ===
         const bulkArchive = document.getElementById("bulk-archive");
