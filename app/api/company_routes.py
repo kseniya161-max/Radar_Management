@@ -1,7 +1,9 @@
 from fastapi import Query
 from app.clients.company_api_client import sync_companies, update_company_contacts
 from app.database.db import SessionDep
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
+
+from app.repositories.company_repository import CompanyRepository
 from app.schemas.company import (
     SCompanyListResponse,
     SCompanyMessageResponse,
@@ -19,7 +21,7 @@ from app.services.company_service import (
     archive_company,
     restore_company,
     bulk_archive,
-    bulk_restore, bulk_soft_deleted,
+    bulk_restore, bulk_soft_deleted, generate_csv,
 )
 
 router_companies = APIRouter(prefix="/companies", tags=["Companies"])
@@ -134,6 +136,16 @@ async def restore_company_status(inn: str, session: SessionDep):
     return {"status": "restored from archive"}
 
 
+@router_companies.post("/export")
+async def export_file(payload: SBulkInnsRequest, session: SessionDep ):
+    repo =CompanyRepository(session)
+    companies = await repo.get_by_inns(payload.inns)
+    csv_content =  generate_csv(companies)
+    return Response(
+    content=csv_content,
+    media_type="text/csv; charset=utf-8",
+    headers={"Content-Disposition": 'attachment; filename="companies.csv"'},
+)
 
 
 

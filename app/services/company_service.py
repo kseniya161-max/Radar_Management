@@ -138,7 +138,7 @@ async def bulk_soft_deleted(db: AsyncSession, inns: list[str]) -> int:
     return count
 
 
-async def generate_csv(companies: list) -> str:
+def generate_csv(companies: list) -> str:
     output = io.StringIO()
     writer = csv.writer(
         output,
