@@ -32,12 +32,15 @@ Radar Management — AI Рейтинг
     <span>Оценено AI: <strong>{{ count_rank }}</strong></span>
     <span>Не оценено AI: <strong>{{ count_not_rank }}</strong></span>
         </div>
-        <div id="bulk-panel" class="bulk-panel" hidden>
+        <div id="bulk-panel" class="bulk-panel">
         <span class="bulk-panel-count">
             Выбрано: <strong id="bulk-count">0</strong>
         </span>
-        <button type="button" id="bulk-archive" class="secondary-button">
+        <button type="button" id="bulk-archive" class="secondary-button" disabled>
             В архив
+        </button>
+            <button type="button" id="bulk-export" class="secondary-button" disabled>
+            Экспорт CSV
         </button>
     </div>
 

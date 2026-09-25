@@ -717,7 +717,6 @@ body {
     border-color: #a52a2a;
 }
 
-
 /* STATS ROW */
 
 .stats-row {
@@ -813,4 +812,16 @@ body {
 .top-scrollbar-inner {
     height: 1px;
     width: 1750px;
+}
+
+/* DISABLED BUTTON */
+
+.secondary-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.danger-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

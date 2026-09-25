@@ -1,5 +1,7 @@
 from sqlalchemy import select, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
+import csv
+import io
 
 
 from app.clients.company_api_client import (
@@ -135,3 +137,63 @@ async def bulk_soft_deleted(db: AsyncSession, inns: list[str]) -> int:
     count = await repo.bulk_soft_delete(inns)
     return count
 
+
+def generate_csv(companies: list) -> str:
+    output = io.StringIO()
+    writer = csv.writer(
+        output,
+        delimiter=";",
+        quoting=csv.QUOTE_MINIMAL,
+    )
+
+    writer.writerow(
+        [
+            "ИНН",
+            "Название",
+            "Телефон",
+            "Email",
+            "Регион",
+            "Дата регистрации",
+            "Выручка 2024",
+            "Выручка 2025",
+            "Рост выручки",
+            "Рост прибыли",
+            "AI Priority",
+            "AI Risk",
+        ]
+    )
+    for company in companies:
+        writer.writerow(
+            [
+                f'="{company.inn}"' if company.inn else "",
+                company.name or "",
+                f'="{company.phone}"' if company.phone else "",
+                company.email or "",
+                company.region or "",
+                f'="{company.registration_date}"' if company.registration_date else "",
+                (
+                    f'="{company.revenue_2024}"'
+                    if company.revenue_2024 is not None
+                    else ""
+                ),
+                (
+                    f'="{company.revenue_2025}"'
+                    if company.revenue_2025 is not None
+                    else ""
+                ),
+                (
+                    f'="{company.revenue_growth_3}"'
+                    if company.revenue_growth_3 is not None
+                    else ""
+                ),
+                (
+                    f'="{company.profit_growth_3}"'
+                    if company.profit_growth_3 is not None
+                    else ""
+                ),
+                company.ai_priority if company.ai_priority is not None else "",
+                company.ai_risk or "",
+            ]
+        )
+
+    return "\ufeff" + output.getvalue()
