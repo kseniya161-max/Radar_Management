@@ -820,3 +820,8 @@ body {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.danger-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
