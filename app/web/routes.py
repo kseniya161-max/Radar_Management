@@ -28,7 +28,6 @@ async def companies_page(
     count_finance = await repo.count_active_with_finance()
     count_archived = await repo.count_archived()
 
-
     return templates.TemplateResponse(
         request=request,
         name="companies.html",
@@ -75,7 +74,7 @@ async def rank(request: Request, session: SessionDep, page: int = 1):
             "page": data["page"],
             "limit": data["limit"],
             "has_ai_ranking": has_ai_ranking,
-            "count_rank":count_rank,
+            "count_rank": count_rank,
             "count_not_rank": count_not_rank,
         },
     )
@@ -97,6 +96,3 @@ async def get_archived(request: Request, session: SessionDep, page: int = 1):
             "limit": data["limit"],
         },
     )
-
-
-

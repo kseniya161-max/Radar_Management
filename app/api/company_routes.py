@@ -21,7 +21,9 @@ from app.services.company_service import (
     archive_company,
     restore_company,
     bulk_archive,
-    bulk_restore, bulk_soft_deleted, generate_csv,
+    bulk_restore,
+    bulk_soft_deleted,
+    generate_csv,
 )
 
 router_companies = APIRouter(prefix="/companies", tags=["Companies"])
@@ -64,6 +66,7 @@ async def bulk_restore_companies(payload: SBulkInnsRequest, session: SessionDep)
     count = await bulk_restore(session, payload.inns)
     await session.commit()
     return {"status": "ok", "count": count}
+
 
 @router_companies.post("/bulk/delete")
 async def bulk_delete_companies(payload: SBulkInnsRequest, session: SessionDep):
@@ -137,16 +140,12 @@ async def restore_company_status(inn: str, session: SessionDep):
 
 
 @router_companies.post("/export")
-async def export_file(payload: SBulkInnsRequest, session: SessionDep ):
-    repo =CompanyRepository(session)
+async def export_file(payload: SBulkInnsRequest, session: SessionDep):
+    repo = CompanyRepository(session)
     companies = await repo.get_by_inns(payload.inns)
-    csv_content =  generate_csv(companies)
+    csv_content = generate_csv(companies)
     return Response(
-    content=csv_content,
-    media_type="text/csv; charset=utf-8",
-    headers={"Content-Disposition": 'attachment; filename="companies.csv"'},
-)
-
-
-
-
+        content=csv_content,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="companies.csv"'},
+    )

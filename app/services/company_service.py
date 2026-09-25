@@ -146,28 +146,42 @@ def generate_csv(companies: list) -> str:
         quoting=csv.QUOTE_MINIMAL,
     )
 
-    writer.writerow([
-        "ИНН", "Название", "Телефон", "Email", "Регион",
-        "Дата регистрации", "Выручка 2024", "Выручка 2025",
-        "Рост выручки", "Рост прибыли", "AI Priority", "AI Risk",
-    ])
+    writer.writerow(
+        [
+            "ИНН",
+            "Название",
+            "Телефон",
+            "Email",
+            "Регион",
+            "Дата регистрации",
+            "Выручка 2024",
+            "Выручка 2025",
+            "Рост выручки",
+            "Рост прибыли",
+            "AI Priority",
+            "AI Risk",
+        ]
+    )
     for company in companies:
-        writer.writerow([
-            company.inn or "",
-            company.name or "",
-            company.phone or "",
-            company.email or "",
-            company.region or "",
-            company.registration_date or "",
-            company.revenue_2024 if company.revenue_2024 is not None else "",
-            company.revenue_2025 if company.revenue_2025 is not None else "",
-            company.revenue_growth_3 if company.revenue_growth_3 is not None else "",
-            company.profit_growth_3 if company.profit_growth_3 is not None else "",
-            company.ai_priority if company.ai_priority is not None else "",
-            company.ai_risk or "",
-        ])
+        writer.writerow(
+            [
+                company.inn or "",
+                company.name or "",
+                company.phone or "",
+                company.email or "",
+                company.region or "",
+                company.registration_date or "",
+                company.revenue_2024 if company.revenue_2024 is not None else "",
+                company.revenue_2025 if company.revenue_2025 is not None else "",
+                (
+                    company.revenue_growth_3
+                    if company.revenue_growth_3 is not None
+                    else ""
+                ),
+                company.profit_growth_3 if company.profit_growth_3 is not None else "",
+                company.ai_priority if company.ai_priority is not None else "",
+                company.ai_risk or "",
+            ]
+        )
 
     return "\ufeff" + output.getvalue()
-
-
-
