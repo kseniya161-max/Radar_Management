@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_password
+from app.exceptions.user import UserAlreadyExistsError
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 
