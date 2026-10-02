@@ -11,8 +11,9 @@ from app.exceptions.company_exc import CompanyNotFoundError
 from app.exceptions.handlers import (
     company_exception_handler,
     checko_exception_handler,
-    ai_exception_handler,
+    ai_exception_handler, user_already_exists_handler,
 )
+from app.exceptions.user import UserAlreadyExistsError
 from app.web.routes import router_web
 
 print("LOADED MAIN !")
@@ -38,4 +39,6 @@ app.include_router(router_tasks)
 app.add_exception_handler(CompanyNotFoundError, company_exception_handler)
 app.add_exception_handler(CheckoAPIError, checko_exception_handler)
 app.add_exception_handler(AiAPIError, ai_exception_handler)
+app.add_exception_handler(UserAlreadyExistsError, user_already_exists_handler)
 app.include_router(router_web)
+
