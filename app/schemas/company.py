@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class SCompanyResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     inn: str
     name: str
