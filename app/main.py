@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-
+from app.api.auth_routes import router_auth
 from app.api.company_routes import router_companies
 from app.api.ai_routes import router_ai
 from app.api.task_routes import router_tasks
@@ -34,6 +34,7 @@ app.mount(
 app.include_router(router_ai)
 app.include_router(router_companies)
 app.include_router(router_tasks)
+app.include_router(router_auth)
 
 
 app.add_exception_handler(CompanyNotFoundError, company_exception_handler)
