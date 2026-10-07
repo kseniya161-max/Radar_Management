@@ -12,3 +12,16 @@ class SUserResponse(BaseModel):
     email: EmailStr
     is_active: bool
 
+
+class SUserLogin(BaseModel):
+    email:EmailStr
+    password: str
+
+
+class SToken(BaseModel):
+    access_token: str
+    token_type: str = 'bearer'
+
+
+
+
