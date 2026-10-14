@@ -1,5 +1,6 @@
 from fastapi import Query
 from app.clients.company_api_client import sync_companies, update_company_contacts
+from app.core.security import UserDep
 from app.database.db import SessionDep
 from fastapi import APIRouter, Response
 
@@ -31,9 +32,9 @@ router_companies = APIRouter(prefix="/companies", tags=["Companies"])
 
 @router_companies.get("", response_model=SCompanyPageResponse)
 async def all_companies(
-    session: SessionDep,
+    session: SessionDep, current_user: UserDep,
     limit: int = Query(20, ge=1, le=100),
-    page: int = Query(1, ge=1),
+    page: int = Query(1, ge=1)
 ):
     """Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
     return await get_all_companies(session, limit, page)
