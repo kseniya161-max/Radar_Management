@@ -32,9 +32,10 @@ router_companies = APIRouter(prefix="/companies", tags=["Companies"])
 
 @router_companies.get("", response_model=SCompanyPageResponse)
 async def all_companies(
-    session: SessionDep, current_user: UserDep,
+    session: SessionDep,
+    current_user: UserDep,
     limit: int = Query(20, ge=1, le=100),
-    page: int = Query(1, ge=1)
+    page: int = Query(1, ge=1),
 ):
     """Эндпоинт получения списка компаний с рассчетом прибыли и выручки"""
     return await get_all_companies(session, limit, page)

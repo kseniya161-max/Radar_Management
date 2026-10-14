@@ -9,16 +9,8 @@ from app.database.db import SessionDep
 from app.repositories.user_repository import UserRepository
 from app.models.user import User
 
-
-
-
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-
-
-
-
 
 
 def hash_password(plain_password: str) -> str:
@@ -55,17 +47,16 @@ def verify_token(token: str):
         )
 
 
-async def get_current_user(session:SessionDep, token: str = Depends(oauth2_scheme)):
+async def get_current_user(session: SessionDep, token: str = Depends(oauth2_scheme)):
     payload = verify_token(token)
-    user_id = payload.get('user_id')
+    user_id = payload.get("user_id")
     if user_id is None:
-        raise HTTPException(status_code=401, detail='Невалидны токен')
+        raise HTTPException(status_code=401, detail="Невалидны токен")
     repo = UserRepository(session)
     user = await repo.get_by_id(user_id)
     if user is None:
-        raise HTTPException(status_code = 401, detail='Пользователь не найден')
+        raise HTTPException(status_code=401, detail="Пользователь не найден")
     return user
-
 
 
 UserDep = Annotated[User, Depends(get_current_user)]

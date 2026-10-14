@@ -20,6 +20,8 @@ async def register(session: SessionDep, data: SUserCreate):
 
 @router_auth.post("/login", response_model=SToken, status_code=status.HTTP_200_OK)
 async def login(session: SessionDep, form_data: OAuth2PasswordRequestForm = Depends()):
-    authentication = await authenticate_user(session, form_data.username, form_data.password)
+    authentication = await authenticate_user(
+        session, form_data.username, form_data.password
+    )
     token = create_access_token(authentication.id)
     return {"access_token": token, "token_type": "bearer"}
