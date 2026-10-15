@@ -1,4 +1,6 @@
 from fastapi import HTTPException, APIRouter
+
+from app.core.security import UserDep
 from app.database.db import SessionDep
 from app.schemas.company import (
     SCompanyRankedResponse,
@@ -15,7 +17,7 @@ router_ai = APIRouter(prefix="/companies", tags=["AI"])
 
 
 @router_ai.get("/ai_ranked", response_model=list[SCompanyRankedResponse])
-async def get_ranked(session: SessionDep):
+async def get_ranked(session: SessionDep, current_user: UserDep):
     repo = CompanyRepository(session)
     companies = await repo.get_all_companies()
     ranked = sorted(companies, key=lambda c: c.ai_priority or 0, reverse=True)
@@ -35,7 +37,7 @@ async def get_ranked(session: SessionDep):
 
 
 @router_ai.post("/{inn}/ai_score", response_model=SCompanyAiScoreResponse)
-async def ai_score_company(inn: str, session: SessionDep):
+async def ai_score_company(inn: str, session: SessionDep, current_user: UserDep):
     repo = CompanyRepository(session)
     company = await repo.get_by_inn(inn)
     if not company:
@@ -51,7 +53,7 @@ async def ai_score_company(inn: str, session: SessionDep):
 
 
 @router_ai.post("/ai_score_all", response_model=SCompanyTaskResponse)
-def ai_score_company_all():
+def ai_score_company_all(current_user: UserDep):
     task = score_all_companies_task.delay()
 
     return {

@@ -44,7 +44,7 @@ async def all_companies(
 @router_companies.post("/create/{okved_code}", response_model=SCompanyMessageResponse)
 async def create_companies(
     okved_code: str,
-    session: SessionDep,
+    session: SessionDep, current_user: UserDep,
     page: int = Query(1, ge=1),
 ):
     """Получение компаний по оквед"""
@@ -57,28 +57,28 @@ async def create_companies(
 
 
 @router_companies.post("/bulk/archive")
-async def bulk_archive_companies(payload: SBulkInnsRequest, session: SessionDep):
+async def bulk_archive_companies(payload: SBulkInnsRequest, session: SessionDep, current_user: UserDep):
     count = await bulk_archive(session, payload.inns)
     await session.commit()
     return {"status": "ok", "count": count}
 
 
 @router_companies.post("/bulk/restore")
-async def bulk_restore_companies(payload: SBulkInnsRequest, session: SessionDep):
+async def bulk_restore_companies(payload: SBulkInnsRequest, session: SessionDep, current_user: UserDep):
     count = await bulk_restore(session, payload.inns)
     await session.commit()
     return {"status": "ok", "count": count}
 
 
 @router_companies.post("/bulk/delete")
-async def bulk_delete_companies(payload: SBulkInnsRequest, session: SessionDep):
+async def bulk_delete_companies(payload: SBulkInnsRequest, session: SessionDep, current_user: UserDep):
     count = await bulk_soft_deleted(session, payload.inns)
     await session.commit()
     return {"status": "ok", "count": count}
 
 
 @router_companies.post("/{inn}/finance", response_model=SCompanyStatusResponse)
-async def update_finance(inn: str, session: SessionDep):
+async def update_finance(inn: str, session: SessionDep, current_user: UserDep):
     """Обогащение финансами по ИНН"""
     company = await get_company_by_inn(session, inn)
     await update_company_finances(session, company)
@@ -87,7 +87,7 @@ async def update_finance(inn: str, session: SessionDep):
 
 
 @router_companies.post("/{inn}/contacts", response_model=SCompanyStatusResponse)
-async def update_contacts(inn: str, session: SessionDep):
+async def update_contacts(inn: str, session: SessionDep, current_user: UserDep):
     """Обогащение контактами по ИНН"""
     company = await get_company_by_inn(session, inn)
     await update_company_contacts(session, company)
@@ -96,14 +96,14 @@ async def update_contacts(inn: str, session: SessionDep):
 
 
 @router_companies.get("/{inn}", response_model=SCompanyResponse)
-async def get_company(inn: str, session: SessionDep):
+async def get_company(inn: str, session: SessionDep, current_user: UserDep):
     """Эндпоинт получения информации по компании по ИНН"""
     company = await get_company_by_inn(session, inn)
     return company
 
 
 @router_companies.post("/{inn}/enrich", response_model=SCompanyStatusResponse)
-async def enrich_company(inn: str, session: SessionDep):
+async def enrich_company(inn: str, session: SessionDep, current_user: UserDep):
     """Обогащения по инн контактами и финансами сразу"""
     company = await get_company_by_inn(session, inn)
     await enrich_company_data(session, company)
@@ -114,7 +114,7 @@ async def enrich_company(inn: str, session: SessionDep):
 @router_companies.post("/sync/{okved_code}/", response_model=SCompanyMessageResponse)
 async def sync_company(
     okved_code: str,
-    session: SessionDep,
+    session: SessionDep, current_user: UserDep,
     page: int = Query(1, ge=1),
     region: str | None = Query(None),
 ):
@@ -128,21 +128,21 @@ async def sync_company(
 
 
 @router_companies.post("/{inn}/archive")
-async def archive_company_status(inn: str, session: SessionDep):
+async def archive_company_status(inn: str, session: SessionDep, current_user: UserDep):
     await archive_company(session, inn)
     await session.commit()
     return {"status": "ok"}
 
 
 @router_companies.post("/{inn}/restore")
-async def restore_company_status(inn: str, session: SessionDep):
+async def restore_company_status(inn: str, session: SessionDep, current_user: UserDep):
     await restore_company(session, inn)
     await session.commit()
     return {"status": "restored from archive"}
 
 
 @router_companies.post("/export")
-async def export_file(payload: SBulkInnsRequest, session: SessionDep):
+async def export_file(payload: SBulkInnsRequest, session: SessionDep, current_user: UserDep):
     repo = CompanyRepository(session)
     companies = await repo.get_by_inns(payload.inns)
     csv_content = generate_csv(companies)
