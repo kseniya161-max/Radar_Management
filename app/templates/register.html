@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация — Radar Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body class="auth-page">
+
+    <div class="auth-card">
+        <h1 class="auth-title">Radar Management</h1>
+        <p class="auth-subtitle">Регистрация</p>
+
+        <form id="register-form">
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль (минимум 8 символов)</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="••••••••"
+                    minlength="8"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="primary-button" id="register-button">
+                Зарегистрироваться
+            </button>
+
+        </form>
+
+        <p class="auth-footer">
+            Уже есть аккаунт?
+            <a href="/web/login">Войти</a>
+        </p>
+    </div>
+
+    <div id="result" class="result" hidden></div>
+
+<script>
+document.getElementById("register-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const button = document.getElementById("register-button");
+    const result = document.getElementById("result");
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) return;
+
+    button.disabled = true;
+    button.textContent = "Регистрация...";
+
+    result.hidden = true;
+
+    try {
+        const response = await fetch("/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+        });
+
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.detail || "Не удалось зарегистрироваться");
+        }
+
+        // Успех — показываем сообщение и через 1,5 сек редирект на логин
+        result.hidden = false;
+        result.className = "result success";
+        result.textContent = "Аккаунт создан. Перенаправляем на вход...";
+
+        setTimeout(() => {
+            window.location.href = "/web/login";
+        }, 1500);
+
+    } catch (error) {
+        result.hidden = false;
+        result.className = "result error";
+        result.textContent = error.message;
+
+        button.disabled = false;
+        button.textContent = "Зарегистрироваться";
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — Radar Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body class="auth-page">
+
+    <div class="auth-card">
+        <h1 class="auth-title">Radar Management</h1>
+        <p class="auth-subtitle">Вход в систему</p>
+
+        <form id="login-form">
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="••••••••"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="primary-button" id="login-button">
+                Войти
+            </button>
+
+        </form>
+
+        <p class="auth-footer">
+            Нет аккаунта?
+            <a href="/web/register">Зарегистрироваться</a>
+        </p>
+    </div>
+
+    <div id="result" class="result" hidden></div>
+
+<script>
+document.getElementById("login-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const button = document.getElementById("login-button");
+    const result = document.getElementById("result");
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) return;
+
+    button.disabled = true;
+    button.textContent = "Входим...";
+
+    result.hidden = true;
+
+    try {
+        // OAuth2PasswordRequestForm ждёт form-data, а не JSON
+        const formData = new URLSearchParams();
+        formData.append("username", email);
+        formData.append("password", password);
+
+        const response = await fetch("/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error("Неверный email или пароль");
+        }
+
+        const data = await response.json();
+
+        localStorage.setItem("access_token", data.access_token);
+
+        window.location.href = "/web/companies";
+
+    } catch (error) {
+        result.hidden = false;
+        result.className = "result error";
+        result.textContent = error.message;
+
+        button.disabled = false;
+        button.textContent = "Войти";
+    }
+});
+</script>
+
+</body>
+</html>

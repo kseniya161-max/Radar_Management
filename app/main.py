@@ -20,7 +20,7 @@ from app.web.routes import router_web
 print("LOADED MAIN !")
 app = FastAPI(
     title="Тест",
-    description="KSENIA TEST !",
+    description="KSENIA TEST 16.10",
     version="0.1.0",
 )
 
