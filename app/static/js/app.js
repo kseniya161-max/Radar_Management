@@ -286,4 +286,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-});
+    // === LOGOUT ===
+    const logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("access_token");
+            window.location.href = "/web/login";
+        });
+    }
+    });
+
+
