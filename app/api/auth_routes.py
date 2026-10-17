@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Depends
 
-from app.core.security import create_access_token
+from app.core.security import create_access_token, create_refresh_token
 from app.database.db import SessionDep
 from app.schemas.user import SUserCreate, SUserResponse, SUserLogin, SToken
 from app.services.user_service import register_user, authenticate_user
@@ -23,5 +23,8 @@ async def login(session: SessionDep, form_data: OAuth2PasswordRequestForm = Depe
     authentication = await authenticate_user(
         session, form_data.username, form_data.password
     )
+
     token = create_access_token(authentication.id)
-    return {"access_token": token, "token_type": "bearer"}
+    refresh_token = create_refresh_token(authentication.id)
+
+    return {"access_token": token, "refresh_token": refresh_token, "token_type": "bearer"}
