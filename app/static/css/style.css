@@ -825,3 +825,61 @@ body {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+
+/* AUTH PAGES */
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f7fa;
+    padding: 20px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e8ef;
+    border-radius: 14px;
+
+    padding: 35px;
+
+    box-shadow: 0 8px 30px rgba(20, 30, 50, 0.06);
+}
+
+.auth-title {
+    margin: 0 0 6px;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.auth-subtitle {
+    margin: 0 0 25px;
+    color: #697386;
+    font-size: 14px;
+    text-align: center;
+}
+
+.auth-footer {
+    margin: 20px 0 0;
+    text-align: center;
+    font-size: 14px;
+    color: #697386;
+}
+
+.auth-footer a {
+    color: #172033;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}

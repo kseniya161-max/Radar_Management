@@ -98,19 +98,11 @@ async def get_archived(request: Request, session: SessionDep, page: int = 1):
     )
 
 
-@router_web.get('/login', include_in_schema=False)
+@router_web.get("/login", include_in_schema=False)
 def web_login(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="login.html")
+    return templates.TemplateResponse(request=request, name="login.html")
 
 
-@router_web.get('/register', include_in_schema=False)
+@router_web.get("/register", include_in_schema=False)
 def web_register(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="register.html")
-
-
-
-
+    return templates.TemplateResponse(request=request, name="register.html")

@@ -22,4 +22,17 @@ class SUserLogin(BaseModel):
 
 class SToken(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
+
+
+class SRefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class SAccessToken(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+

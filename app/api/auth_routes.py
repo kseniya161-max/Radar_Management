@@ -1,8 +1,8 @@
-from fastapi import APIRouter, status, Depends
-
-from app.core.security import create_access_token
+from fastapi import APIRouter, status, Depends,HTTPException
+from app.core.security import create_access_token, create_refresh_token, verify_token
 from app.database.db import SessionDep
-from app.schemas.user import SUserCreate, SUserResponse, SUserLogin, SToken
+from app.repositories.user_repository import UserRepository
+from app.schemas.user import SUserCreate, SUserResponse, SUserLogin, SToken, SAccessToken, SRefreshRequest
 from app.services.user_service import register_user, authenticate_user
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -23,5 +23,25 @@ async def login(session: SessionDep, form_data: OAuth2PasswordRequestForm = Depe
     authentication = await authenticate_user(
         session, form_data.username, form_data.password
     )
+
     token = create_access_token(authentication.id)
-    return {"access_token": token, "token_type": "bearer"}
+    refresh_token = create_refresh_token(authentication.id)
+
+    return {"access_token": token, "refresh_token": refresh_token, "token_type": "bearer"}
+
+
+@router_auth.post("/refresh", response_model=SAccessToken)
+async def token_refresh(data: SRefreshRequest, session: SessionDep):
+    payload = verify_token(data.refresh_token)
+    if payload.get("type") != "refresh":
+        raise HTTPException(status_code=401, detail="Неверный тип токена")
+    user_id = payload.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Невалидный токен")
+    repo = UserRepository(session)
+    user = await repo.get_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=401, detail = "Пользователь не найден")
+    new_access = create_access_token(user_id)
+    return {"access_token": new_access, "token_type": "bearer"}
+
