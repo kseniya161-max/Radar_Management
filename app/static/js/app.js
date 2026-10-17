@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btnAiScore.textContent = "AI анализирует...";
 
             try {
-                const response = await fetch("/companies/ai_score_all", {
+                const response = await fetchWithAuth("/companies/ai_score_all", {
                     method: "POST"
                 });
 
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const taskId = data.task_id;
 
                 const checkStatus = async () => {
-                    const statusResponse = await fetch(`/tasks/${taskId}`);
+                    const statusResponse = await fetchWithAuth(`/tasks/${taskId}`);
 
                     if (!statusResponse.ok) {
                         throw new Error("Не удалось получить статус задачи");
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", async () => {
             const inn = button.dataset.inn;
             try {
-                const response = await fetch(`/companies/${inn}/archive`, {
+                const response = await fetchWithAuth(`/companies/${inn}/archive`, {
                     method: "POST"
                 });
                 if (!response.ok) {
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", async () => {
             const inn = button.dataset.inn;
             try {
-                const response = await fetch(`/companies/${inn}/restore`, {
+                const response = await fetchWithAuth(`/companies/${inn}/restore`, {
                     method: "POST"
                 });
                 if (!response.ok) {
@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
             try {
-                const response = await fetch("/companies/export", {
+                const response = await fetchWithAuth("/companies/export", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ inns: inns })
@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (inns.length === 0) return;
 
                 try {
-                    const response = await fetch("/companies/bulk/archive", {
+                    const response = await fetchWithAuth("/companies/bulk/archive", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ inns: inns })
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (inns.length === 0) return;
 
                 try {
-                    const response = await fetch("/companies/bulk/restore", {
+                    const response = await fetchWithAuth("/companies/bulk/restore", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ inns: inns })
@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!confirmed) return;
 
                 try {
-                    const response = await fetch("/companies/bulk/delete", {
+                    const response = await fetchWithAuth("/companies/bulk/delete", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ inns: inns })
@@ -291,9 +291,64 @@ document.addEventListener("DOMContentLoaded", () => {
     if (logoutBtn) {
         logoutBtn.addEventListener("click", () => {
             localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token"); // <--- добавить
             window.location.href = "/web/login";
         });
     }
     });
+
+    async function fetchWithAuth(url, options = {}) {
+
+    let token = localStorage.getItem("access_token");
+
+
+    const headers = {
+        ...options.headers,
+        "Authorization": `Bearer ${token}`
+    };
+
+
+    let response = await fetch(url, { ...options, headers });
+
+
+    if (response.status === 401) {
+        const refreshToken = localStorage.getItem("refresh_token");
+
+
+        if (!refreshToken) {
+            localStorage.removeItem("access_token");
+            window.location.href = "/web/login";
+            return;
+        }
+
+        try {
+
+            const refreshResponse = await fetch("/auth/refresh", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ refresh_token: refreshToken })
+            });
+
+            if (refreshResponse.ok) {
+                const data = await refreshResponse.json();
+
+                localStorage.setItem("access_token", data.access_token);
+
+
+                headers["Authorization"] = `Bearer ${data.access_token}`;
+                response = await fetch(url, { ...options, headers });
+            } else {
+
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                window.location.href = "/web/login";
+            }
+        } catch (error) {
+            console.error("Ошибка при обновлении токена", error);
+        }
+    }
+
+    return response;
+}
 
 
