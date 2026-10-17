@@ -28,3 +28,11 @@ class SToken(BaseModel):
 
 class SRefreshRequest(BaseModel):
     refresh_token: str
+
+
+class SAccessToken(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+
