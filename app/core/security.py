@@ -38,8 +38,11 @@ def create_refresh_token(user_id: int) -> str:
     to_encode = {"user_id": user_id, "type": "refresh"}
     expire = datetime.now() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
     return encoded_jwt
+
 
 def verify_token(token: str):
     """Проверка Подписи + срок"""
