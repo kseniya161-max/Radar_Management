@@ -15,6 +15,7 @@ from app.exceptions.handlers import (
     user_already_exists_handler,
 )
 from app.exceptions.user import UserAlreadyExistsError
+from app.middlewares.logging import log_companies_only
 from app.web.routes import router_web
 
 print("LOADED MAIN !")
@@ -31,6 +32,8 @@ app.mount(
     name="static",
 )
 
+
+app.middleware('http')(log_companies_only)
 
 app.include_router(router_ai)
 app.include_router(router_companies)

@@ -33,6 +33,3 @@ class SRefreshRequest(BaseModel):
 class SAccessToken(BaseModel):
     access_token: str
     token_type: str = "bearer"
-
-
-
